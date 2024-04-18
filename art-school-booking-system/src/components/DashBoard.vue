@@ -148,6 +148,7 @@ export default {
   created() {
     this.setUserRole();
     this.setUserName();
+    this.handleNavSelection('1');
   },
 
   methods: {

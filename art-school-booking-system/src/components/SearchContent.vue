@@ -37,22 +37,46 @@
 
       <!--搜索结果-->
       <el-main>
-        <div v-if="searchResults.length > 0">
-          <h2>搜索结果</h2>
-          <el-card
-            class="box-card"
-            v-for="result in searchResults"
-            :key="result.id"
-            style="margin-bottom: 20px"
-          >
-            <h3>{{ result.title }}</h3>
-            <p>{{ result.description }}</p>
-            <p>教师: {{ result.teacher }}</p>
-            <p>课程时长: {{ result.duration }}分钟</p>
-            <p>课程日期: {{ result.date }}</p>
-            <p>价格: {{ result.price }}</p>
-          </el-card>
-        </div>
+        <el-row :gutter="20">
+          <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="result in searchResults" :key="result.id">
+            <el-card shadow="hover" style="margin-bottom: 20px">
+              <div>
+                <div class="content-field">
+                  <el-tag size="small" effect="plain">课程名称</el-tag>
+                  <h2 class="el-typography">{{ result.title }}</h2>
+                </div>
+
+                <el-divider></el-divider>
+
+                <div class="content-field">
+                  <span class="content-label content-tag"><el-tag size="small" effect="plain">描述</el-tag></span>
+                  <div class="content-description">{{ result.description }}</div>
+                </div>
+
+                <el-divider></el-divider>
+
+                <div class="meta">
+                  <div class="content-field">
+                    <el-tag size="small" effect="plain">教师</el-tag>
+                    <el-tag>{{ result.teacher }}</el-tag>
+                  </div>
+                  <div class="content-field">
+                    <el-tag size="small" effect="plain">时长</el-tag>
+                    <el-tag type="success">{{ result.duration }} 分钟</el-tag>
+                  </div>
+                  <div class="content-field">
+                    <el-tag size="small" effect="plain">日期</el-tag>
+                    <el-tag type="info">{{ new Date(result.date).toLocaleDateString() }}</el-tag>
+                  </div>
+                  <div class="content-field">
+                    <el-tag size="small" effect="plain">价格</el-tag>
+                    <el-tag type="warning">¥{{ result.price }}</el-tag>
+                  </div>
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
       </el-main>
     </el-container>
   </div>
@@ -129,10 +153,39 @@ export default {
 }
 
 .el-main {
+  margin-top: 50px;
   padding: 10px 0;
+  height :100vh;
 }
 
 .box-card {
   margin-bottom: 20px;
+}
+
+
+
+.content-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.el-typography {
+  margin: 0;
+}
+
+.meta .content-field {
+  margin-bottom: 0.5em;
+}
+
+.el-card {
+  display: flex;
+  flex-direction: column; /* 使用flex布局，和下面的 margin-bottom 配合使用，确保内容撑开 */
+  min-height: 300px; /* 为卡片设置统一最小高度，您可以根据实际需求调整此值 */
+  margin-bottom: 1em; /* 为卡片底部提供一些间隔 */
+}
+
+.el-card .meta {
+  margin-top: auto; /* 使用自动外边距将meta部分推到底部 */
 }
 </style>
