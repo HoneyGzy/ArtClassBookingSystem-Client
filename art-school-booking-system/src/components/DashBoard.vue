@@ -58,7 +58,7 @@
 
         <el-menu-item index="7" @click="handleNavSelection('7')">
           <el-icon><shopping-cart /></el-icon>
-          <span>购课报名</span>
+          <span>购课支付</span>
         </el-menu-item>
 
         <el-menu-item index="8" @click="handleNavSelection('8')">

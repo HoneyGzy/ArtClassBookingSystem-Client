@@ -1,41 +1,49 @@
 <template>
-    <div class="course-registration">
-      <h2>选择课程</h2>
-      <select v-model="selectedCourse" @change="updateTotalPrice">
-        <option v-for="course in courses" :key="course.id" :value="course">
-          {{ course.name }} - {{ formatCurrency(course.price) }}
-        </option>
-      </select>
-  
-      <h2>价格总计: {{ formatCurrency(totalPrice) }}</h2>
-  
-      <form @submit.prevent="handleRegistration" class="registration-form">
-        <h2>填写个人信息</h2>
-        <input v-model="registrationInfo.name" placeholder="姓名" required />
-        <input v-model="registrationInfo.email" type="email" placeholder="邮箱" required />
-        <textarea v-model="registrationInfo.notes" placeholder="备注"></textarea>
-        <button type="submit" class="submit-button">提交报名</button>
-      </form>
-  
-      <div v-if="showPaymentScreen" class="payment-section">
-        <h2>支付</h2>
-        <!-- 在这里集成实际的支付系统组件 -->
-        <p>请继续以完成支付...</p>
-        <button @click="processPayment">支付 {{ formatCurrency(totalPrice) }}</button>
-      </div>
+  <el-container class="course-registration" direction="vertical">
+    <div class="course-selection">
+      <h2 class="course-title">已经预约的课程</h2>
+      <el-select v-model="selectedCourse" @change="updateTotalPrice" placeholder="请选择" class="course-menu">
+        <el-option
+          v-for="course in courses"
+          :key="course.id"
+          :label="course.courseTitle + ' - ' + formatCurrency(course.price)"
+          :value="course.id">
+        </el-option>
+      </el-select>
     </div>
-  </template>
-  
-  <script>
+
+    <h2>价格总计: {{ formatCurrency(totalPrice) }}</h2>
+
+    <el-form class="registration-form" >
+      <form @submit.prevent="handleSubmit()">
+        <h2>填写个人信息</h2>
+        <el-input v-model="registrationInfo.name" placeholder="姓名" required class="form-input"></el-input>
+        <el-input v-model="registrationInfo.email" type="email" placeholder="邮箱" required class="form-input"></el-input>
+        <el-input v-model="registrationInfo.notes" type="textarea" placeholder="备注" class="form-input"></el-input>
+        <el-button type="primary" native-type="submit">提交报名</el-button>
+      </form>
+    </el-form>
+
+    <el-dialog v-model="showPaymentScreen" title="支付">
+      <h2>支付</h2>
+      <!-- 在这里集成实际的支付系统组件 -->
+      <p>请继续以完成支付...</p>
+      <el-button type="primary" @click="processPayment">支付 {{ formatCurrency(totalPrice) }}</el-button>
+      <template v-slot:footer>
+        <el-button @click="showPaymentScreen = false">关闭</el-button>
+      </template>
+    </el-dialog>
+  </el-container>
+</template>
+
+<script>
+import axios from 'axios';
+
   export default {
     name: 'CourseRegistration',
     data() {
       return {
-        courses: [
-          { id: 1, name: '绘画初级课程', price: 300 },
-          { id: 2, name: '雕塑入门课程', price: 500 },
-          // 更多课程...
-        ],
+        courses: [],
         selectedCourse: null,
         totalPrice: 0,
         registrationInfo: {
@@ -43,13 +51,40 @@
           email: '',
           notes: ''
         },
-        showPaymentScreen: false
+        showPaymentScreen: false,
+        username:null,
+        
       };
     },
+    created() {
+      this.username = localStorage.getItem('userName');
+      console.log(this.username)
+      this.fetchCourses();
+    },
     methods: {
+      fetchCourses() {
+        const users = this.username;
+        axios.get(`http://localhost:3000/api/courseregistration`, {
+          params: {
+            username: users
+          }
+        })
+        .then(response => {
+          this.courses = response.data;
+        })
+        .catch(error => {
+          console.error(error);
+          // 添加错误处理
+        })
+      },
       updateTotalPrice() {
         if (this.selectedCourse) {
-          this.totalPrice = this.selectedCourse.price;
+          const course = this.courses.find(c => c.id === this.selectedCourse);
+          if (course) {
+            this.totalPrice = course.price;
+          } else {
+            console.error(`Course with id ${this.selectedCourse} not found`);
+          }
         }
       },
       formatCurrency(amount) {
@@ -61,6 +96,10 @@
         });
         return formatter.format(amount);
       },
+      handleSubmit() {
+        this.handleRegistration()
+      },
+      
       handleRegistration() {
         // 处理注册逻辑...
         // 假设所有验证都通过了，并且用户的信息已经提交成功，我们将显示支付屏幕
@@ -75,16 +114,32 @@
   };
   </script>
   
-  <style scoped>
-  .course-registration .registration-form {
-    margin-top: 20px;
+<style scoped>
+  .course-selection {
+    display: flex;
+    align-items: center;
+  }
+
+  .course-title {
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+
+  .course-menu {
+    flex-grow: 1;
+  }
+
+  .el-container {
+  width: 25%;  /* 设置宽度为50% */
+  margin: 0 auto;  /* 居中对齐 */
+  }
+
+  .form-input {
+    width: 100%;  /* 你可以将 100% 替换为具体的像素值或其他单位 */
+    font-size: 16px;  /* 调整字体大小 */
   }
   
-  .course-registration .submit-button {
-    margin-top: 10px;
+  .text-area {
+    height: 150px;  /* 针对文本区域调整高度 */
   }
-  
-  .course-registration .payment-section {
-    margin-top: 40px;
-  }
-  </style>
+</style>
