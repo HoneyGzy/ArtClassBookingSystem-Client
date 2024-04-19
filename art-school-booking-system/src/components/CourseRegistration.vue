@@ -20,17 +20,20 @@
         <el-input v-model="registrationInfo.name" placeholder="姓名" required class="form-input"></el-input>
         <el-input v-model="registrationInfo.email" type="email" placeholder="邮箱" required class="form-input"></el-input>
         <el-input v-model="registrationInfo.notes" type="textarea" placeholder="备注" class="form-input"></el-input>
-        <el-button type="primary" native-type="submit">提交报名</el-button>
+        <el-button type="primary" native-type="submit">提交</el-button>
       </form>
     </el-form>
 
-    <el-dialog v-model="showPaymentScreen" title="支付">
-      <h2>支付</h2>
+    <el-dialog v-model="showPaymentScreen" title="支付" class="payment-dialog">
+      <h2 class="payment-title">支付详情</h2>
+      <p class="payment-detail">课程: {{ courseTitle }}</p> 
+      <p class="payment-detail">购买人姓名: {{ registrationInfo.name }}</p> 
+      <p class="payment-detail">邮箱: {{ registrationInfo.email }}</p> 
       <!-- 在这里集成实际的支付系统组件 -->
-      <p>请继续以完成支付...</p>
-      <el-button type="primary" @click="processPayment">支付 {{ formatCurrency(totalPrice) }}</el-button>
+      <p class="payment-instruction">请继续以完成支付...</p>
+      <el-button class="payment-button" type="primary" @click="processPayment">支付 {{ formatCurrency(totalPrice) }}</el-button>
       <template v-slot:footer>
-        <el-button @click="showPaymentScreen = false">关闭</el-button>
+        <el-button class="close-button" @click="showPaymentScreen = false">关闭</el-button>
       </template>
     </el-dialog>
   </el-container>
@@ -46,6 +49,7 @@ import axios from 'axios';
         courses: [],
         selectedCourse: null,
         totalPrice: 0,
+        courseTitle:null,
         registrationInfo: {
           name: '',
           email: '',
@@ -101,6 +105,14 @@ import axios from 'axios';
       },
       
       handleRegistration() {
+        if (this.selectedCourse) {
+          const course = this.courses.find(c => c.id === this.selectedCourse);
+          if (course) {
+            this.courseTitle = course.title;
+          } else {
+            console.error(`Course with id ${this.selectedCourse} not found`);
+          }
+        }
         // 处理注册逻辑...
         // 假设所有验证都通过了，并且用户的信息已经提交成功，我们将显示支付屏幕
         this.showPaymentScreen = true;
@@ -140,6 +152,32 @@ import axios from 'axios';
   }
   
   .text-area {
-    height: 150px;  /* 针对文本区域调整高度 */
+    height: 200px;  /* 针对文本区域调整高度 */
+  }
+
+  .payment-dialog {
+    background: #f5f5f5;
+    border-radius: 10px;
+    color: #333;
+  }
+  .payment-title {
+    color: #1f2d3d;
+    font-size: 24px;
+  }
+  .payment-detail {
+    color: #606266;
+    font-size: 18px;
+  }
+  .payment-instruction {
+    color: #909399;
+    font-size: 16px;
+  }
+  .payment-button {
+    background-color: #f7b824;
+    color: white;
+  }
+  .close-button {
+    background-color: #e6a23c;
+    color: white;
   }
 </style>
