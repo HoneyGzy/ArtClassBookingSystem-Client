@@ -24,14 +24,15 @@
       </form>
     </el-form>
 
-    <el-dialog v-model="showPaymentScreen" title="支付" class="payment-dialog">
+    <el-dialog v-model="showPaymentScreen" class="payment-dialog">
       <h2 class="payment-title">支付详情</h2>
       <p class="payment-detail">课程: {{ courseTitle }}</p> 
       <p class="payment-detail">购买人姓名: {{ registrationInfo.name }}</p> 
       <p class="payment-detail">邮箱: {{ registrationInfo.email }}</p> 
       <!-- 在这里集成实际的支付系统组件 -->
       <p class="payment-instruction">请继续以完成支付...</p>
-      <el-button class="payment-button" type="primary" @click="processPayment">支付 {{ formatCurrency(totalPrice) }}</el-button>
+      <el-button class="payment-button" type="primary" @click="processPayment(true,courseTitle)">支付成功</el-button>
+      <el-button class="payment-button" type="danger" @click="processPayment(false,courseTitle)">支付失败</el-button>
       <template v-slot:footer>
         <el-button class="close-button" @click="showPaymentScreen = false">关闭</el-button>
       </template>
@@ -117,11 +118,36 @@ import axios from 'axios';
         // 假设所有验证都通过了，并且用户的信息已经提交成功，我们将显示支付屏幕
         this.showPaymentScreen = true;
       },
-      processPayment() {
-        // 在这里处理支付逻辑，例如调用支付API
-        alert('支付流程启动...（在这里集成真实的支付系统）');
-        // 支付成功后，清理表单或重定向到其他页面
-      }
+      processPayment(success,courseTitle) {
+        // 模拟支付过程
+        if (success) {
+          // 处理支付成功的情况
+          this.$message({
+            message: '支付成功！',
+            type: 'success'
+          });
+          console.log(courseTitle)
+          axios.post('http://localhost:3000/api/payment-successful', {
+                params: {
+                  courseTitle: courseTitle
+              }
+          }).then((response) => {
+            // 处理服务器回应
+            console.log(response);
+          }).catch((error) => {
+            // 在这里处理请求失败
+            console.error(error);
+          });
+        } else {
+          // 处理支付失败的情况
+          this.$message({
+            message: '支付失败',
+            type: 'error'
+          });
+        }
+        // 无论支付是否成功，都关闭支付对话框
+        this.showPaymentScreen = false;
+     }
     }
   };
   </script>
