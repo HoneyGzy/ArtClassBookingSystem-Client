@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>用户中心</h2>
-        <el-tabs v-model="activeTab">
+        <el-tabs v-model="activeTab" @tab-click="handleTabClick">
           <el-tab-pane label="个人信息" name="profile">
               <el-form :model="user" :rules="rules" ref="form" label-width="120px">
                 <el-form-item label="名字" prop="name">
@@ -48,38 +48,38 @@
                   <el-button @click="resetForm('form')">重置</el-button>
                 </el-form-item>
               </el-form>
-            </el-tab-pane>
-            <el-tab-pane label="预约课程" name="courses">
-              <el-row :gutter="20">
-                <CourseCard :searchResults="searchResults">
+          </el-tab-pane>
+          <el-tab-pane label="我的预约" name="courses">
+            <el-row :gutter="20">
+              <CourseCard :searchResults="searchResults">
                 <template #extra>
                   <el-tag type="success">已预约</el-tag>
                 </template>
-                </CourseCard>
-              </el-row>
-            </el-tab-pane>
-            <el-tab-pane label="购课历史" name="history">
-              <el-row :gutter="20">
-                <CourseCard :searchResults="searchResults">
-                  <template #extra>
-                    <el-tag type="success">已购课</el-tag>
-                  </template>
-                </CourseCard>
-              </el-row>
-            </el-tab-pane>
-            <el-tab-pane label="学习进度" name="progress">
-                <div>
-                    {{ user.progress }}% 
-                </div>
-            </el-tab-pane>
-            <el-tab-pane label="喜好设置" name="preferences">
-                <el-checkbox v-model="user.preferences">开启通知</el-checkbox>
-            </el-tab-pane>
-            <el-tab-pane label="交易记录" name="transactions">
-                <div v-for="transaction in user.transactions" :key="transaction.id">
-                    {{ transaction.amount }} - {{ transaction.date }}
-                </div>
-            </el-tab-pane>
+              </CourseCard>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="购课历史" name="history">
+            <el-row :gutter="20">
+              <CourseCard :searchResults="searchResults">
+                <template #extra>
+                  <el-tag type="success">已购课</el-tag>
+                </template>
+              </CourseCard>
+            </el-row>
+          </el-tab-pane>
+          <el-tab-pane label="学习进度" name="progress">
+          <div>
+            {{ user.progress }}% 
+          </div>
+          </el-tab-pane>
+          <el-tab-pane label="喜好设置" name="preferences">
+            <el-checkbox v-model="user.preferences">开启通知</el-checkbox>
+          </el-tab-pane>
+          <el-tab-pane label="交易记录" name="transactions">
+            <div v-for="transaction in user.transactions" :key="transaction.id">
+              {{ transaction.amount }} - {{ transaction.date }}
+            </div>
+          </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -127,10 +127,37 @@ export default {
   created() {
       this.username = localStorage.getItem('userName');
       console.log(this.username)
-      this.fetchCourses();
   },
 
   methods: {
+    handleTabClick(tab) {
+      console.log(tab);
+      console.log(tab.name)
+      switch(tab.name) {
+        case 'profile':
+          // 执行个人信息页签被点击时的逻辑
+          break;
+        case 'courses':
+          console.log(11111111111)
+          this.fetchCourses();
+          break;
+        case 'history':
+          // 执行购课历史页签被点击时的逻辑
+          break;
+        case 'progress':
+          // 执行学习进度页签被点击时的逻辑
+          break;
+        case 'preferences':
+          // 执行喜好设置页签被点击时的逻辑
+          break;
+        case 'transactions':
+          // 执行交易记录页签被点击时的逻辑
+          break;
+        default:
+          // 默认行为
+          break;
+        }
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {

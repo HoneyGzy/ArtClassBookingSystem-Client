@@ -1,6 +1,9 @@
 <template>
   <el-container class="dashboard-container">
-    <el-header class="dashboard-header">
+    <el-header
+      v-bind:class="{'header-red': userRole === 'teacher', 'header-blue': userRole !== 'teacher'}"
+      class="dashboard-header"
+    >
       <h1 class="dashboard-title">艺术学校约课管理系统</h1>
       <div class="user-info">
         <span class="username">欢迎您：{{ username }}</span>
@@ -53,10 +56,10 @@
 
         <el-menu-item index="6" @click="handleNavSelection('6')">
           <el-icon><calendar /></el-icon>
-          <span>预约课程</span>
+          <span>{{ userRole === 'teacher' ? '预约管理' : '预约课程' }}</span>
         </el-menu-item>
 
-        <el-menu-item index="7" @click="handleNavSelection('7')">
+        <el-menu-item index="7" @click="handleNavSelection('7')"  v-if="userRole === 'student'" >
           <el-icon><shopping-cart /></el-icon>
           <span>购课支付</span>
         </el-menu-item>
@@ -94,6 +97,7 @@ import UserCenterComponent from './UserCenter.vue'
 import CourseRegistration from './CourseRegistration.vue'
 import CourseListComponent from './CourseListContent.vue'
 import CourseManagerComponent from './CourseManagerContent.vue'
+import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
 export default {
@@ -110,6 +114,7 @@ export default {
     CourseRegistration,
     CourseListComponent,
     CourseManagerComponent,
+    BookingCotentManageComponent,
 
     ElContainer,
     ElHeader,
@@ -186,8 +191,13 @@ export default {
           this.selectedCategoryComponent = 'searchComponent';
           break;
         case '6':
-          this.selectedCategoryComponent = 'CourseBookingCotent';
-          break;    
+          if (this.userRole === 'teacher') {
+            this.selectedCategoryComponent = 'BookingCotentManageComponent';
+            break;
+          } else {
+            this.selectedCategoryComponent = 'CourseBookingCotent';
+            break;    
+          }
         case '7':
           this.selectedCategoryComponent = 'CourseRegistration';
           break;    
@@ -262,10 +272,17 @@ export default {
   display: flex;
   justify-content: space-between; /* 平均分配主轴空间 */
   align-items: center;
-  background-color: #5b0096; /* 示例颜色 */
   padding: 2em;
   color: #fff;
   height: 108px;
+}
+
+.header-red {
+  background-color: red;
+}
+
+.header-blue {
+  background-color: rgb(122, 3, 158);
 }
 
 .user-info {
