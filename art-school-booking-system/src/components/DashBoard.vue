@@ -37,7 +37,7 @@
           <!-- 使用 v-if 判断，只有当角色是 'teacher' 或 'admin' 时才显示 -->
           <el-menu-item index="3-2" v-if="userRole === 'teacher' || userRole === 'admin'" @click="handleNavSelection('3-2')">创建课程</el-menu-item>
           <!-- 使用 v-if 判断，只有当角色是 'teacher' 或 'admin' 时才显示 -->
-          <el-menu-item index="3-3" v-if="userRole === 'teacher' || userRole === 'admin'" @click="handleNavSelection('3-3')">管理课程</el-menu-item>
+          <el-menu-item index="3-3" v-if="userRole === 'admin'" @click="handleNavSelection('3-3')">管理课程</el-menu-item>
         </el-menu-item-group>
         </el-sub-menu>
 

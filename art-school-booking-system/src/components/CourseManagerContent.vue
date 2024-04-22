@@ -1,15 +1,17 @@
 <template>
     <div class="course-list">
-      <div v-for="(course, index) in courses" :key="course.id" class="course-item">
-        <h2>{{ course.title }}</h2>
-        <p>{{ course.description }}</p>
-        <p>{{ course.teacher }}</p>
-        <p>{{ course.duration }}</p>
-        <p>{{ new Date(course.date).toLocaleString() }}</p>
-        <p>{{ course.price }}</p>
-        <button @click="editCourse(index)">编辑课程</button>
-        <button @click="deleteCourse(index)">删除课程</button>
-      </div>
+      <el-row :gutter="20">
+        <CourseCard
+            v-for="course in courses"
+            :key="course.id"
+            :searchResults="[course]"
+        >
+          <template #extra>
+            <el-button type="primary" @click="editCourse(course)">编辑课程</el-button>
+            <el-button type="primary" @click="deleteCourse(course)">删除课程</el-button>
+          </template>
+        </CourseCard>
+      </el-row>
 
       <!-- Modal window for course editing -->
       <div class="modal" v-if="showModal">
@@ -39,10 +41,14 @@
 </template>
 
 <script>
+import CourseCard from './CourseCard.vue'
 import axios from 'axios';
 
 export default {
   name:'CourseManagerComponent',
+  components: {
+    CourseCard
+  },
   data() {
     return {
       courses: [],
@@ -63,9 +69,9 @@ export default {
           console.error(error);
         })
     },
-    editCourse(index) {
+    editCourse(course) {
       this.showModal = true;
-      this.selectedCourse = Object.assign({}, this.courses[index]);  // 避免直接修改课程列表数据
+      this.selectedCourse = Object.assign({}, course);  // 避免直接修改课程列表数据
     },
     closeModal() {
       this.showModal = false;
@@ -84,12 +90,12 @@ export default {
           console.error(error);
         });
     },
-    deleteCourse(index) {
-      console.log(index)  
-      axios.delete(`http://localhost:3000/api/courses/${this.courses[index].id}`)
+    deleteCourse(course) {
+      console.log(course)  
+      axios.delete(`http://localhost:3000/api/courses/${course.id}`)
         .then(response => {
           console.log(response)  
-          this.courses.splice(index, 1);
+          this.courses.splice(course, 1);
         })
         .catch(error => {
           console.error(error);

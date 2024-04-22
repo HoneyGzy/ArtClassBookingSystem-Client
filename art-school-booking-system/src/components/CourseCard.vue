@@ -44,14 +44,10 @@
 export default {
 props: {
     searchResults: {
-    type: Array,
-    required: true
+      type: Array,
+      required: true
+        }
     }
-    // course: {
-    //   type: Object,
-    //   required: true
-    // }
-}
 }
 </script>
 
