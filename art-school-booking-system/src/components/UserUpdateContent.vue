@@ -16,7 +16,7 @@
           <el-input v-model="editUser.username" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="新密码">
-          <el-input v-model="newPassword" type="password" placeholder="输入新密码" autocomplete="off"></el-input>
+          <el-input v-model="editUser.newPassword" type="password" placeholder="输入新密码" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="角色">
           <el-select v-model="editUser.role" placeholder="选择角色">
@@ -46,8 +46,8 @@
         editUser: {
           username: '',
           role: '',
+          newPassword: '',
         }, //存储被编辑的用户信息
-        newPassword: '',
       };
     },
     created() {
