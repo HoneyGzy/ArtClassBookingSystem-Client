@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div ref="container">
         <h2>用户中心</h2>
         <el-tabs v-model="activeTab" @tab-click="handleTabClick">
           <el-tab-pane label="个人信息" name="profile">
@@ -68,17 +68,41 @@
             </el-row>
           </el-tab-pane>
           <el-tab-pane label="学习进度" name="progress">
-          <div>
-            {{ user.progress }}% 
-          </div>
+            <el-row :gutter="20">
+              <CourseCard
+                  v-for="course in searchResults"
+                  :key="course.id"
+                  :searchResults="[course]"
+              >
+                <template #extra>
+                  <div>
+                    <el-progress :percentage="getCourseStatus(course).progress"></el-progress>
+                    <el-tag>{{ getCourseStatus(course).tag }}</el-tag>
+                  </div>
+                </template>
+              </CourseCard>
+            </el-row>
           </el-tab-pane>
           <el-tab-pane label="喜好设置" name="preferences">
             <el-checkbox v-model="user.preferences">开启通知</el-checkbox>
           </el-tab-pane>
           <el-tab-pane label="交易记录" name="transactions">
-            <div v-for="transaction in user.transactions" :key="transaction.id">
-              {{ transaction.amount }} - {{ transaction.date }}
-            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>课程标题</th>
+                  <th>支付状态</th>
+                  <th>价格</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="transaction in transactions" :key="transaction.id">
+                  <td>{{ transaction.courseTitle }}</td>
+                  <td>{{ transaction.paymentStatus }}</td>
+                  <td>{{ transaction.price }}</td>
+                </tr>
+              </tbody>
+            </table>
           </el-tab-pane>
         </el-tabs>
     </div>
@@ -107,6 +131,7 @@ export default {
         address: "",
       },
       searchResults:{},
+      transactions:[],
       rules: {
         name: [
           { required: true, message: "请输入名字", trigger: "blur" }
@@ -120,8 +145,27 @@ export default {
           { pattern: /^1[3-9]\d{9}$/, message: "请输入有效的手机号", trigger: "blur" }
         ],
         // 可以添加其他字段的验证规则
-      }
+      },
+      resizeObserver: null, // 存储resizeObserver实例
     };
+  },
+  
+  mounted() {
+    // 假设你想观察的元素是一个名为 container 的 div
+    this.resizeObserver = new ResizeObserver(entries => {
+      window.requestAnimationFrame(() => {
+        if (!Array.isArray(entries) || !entries.length) {
+          return;
+        }
+        // 在这里编写你对尺寸变化的处理逻辑
+        console.log(entries[0].contentRect);
+      });
+    });
+
+    // 开始观察
+    if (this.$refs.container) {
+      this.resizeObserver.observe(this.$refs.container);
+    }
   },
 
   created() {
@@ -129,28 +173,70 @@ export default {
       console.log(this.username)
   },
 
+
+  unmounted() {
+    // 或者在Vue 3中使用 unmounted
+    // 停止观察并进行清理
+    if (this.$refs.container && this.resizeObserver) {
+      this.resizeObserver.unobserve(this.$refs.container);
+    }
+  },
+
   methods: {
+    formatDate(row, column, cellValue) {
+      return new Date(cellValue).toLocaleString();
+    },
+    getCourseStatus(course) {
+      console.log(course)
+      // 解析课程日期
+      const courseDate = new Date(course.date);
+      // 获取当前日期
+      const now = new Date();
+      // 如果课程状态为预约成功
+      if (course.reservationStatus === '预约成功') {
+        // 检查课程日期是否在当前日期之后
+        if (courseDate > now) {
+          // 如果课程还没有开始，返回30%的进度和预约成功未开课的标签
+          return {
+            progress: 30,
+            tag: '预约成功，未开课'
+          };
+        } else {
+          // 如果课程已经开始，返回100%的进度和课程已完成的标签
+          return {
+            progress: 100,
+            tag: '课程已完成'
+          };
+        }
+      } else {
+        // 如果预约未成功，返回0%的进度和预约未成功的标签
+        return {
+          progress: 0,
+          tag: '预约未成功'
+        };
+      }
+    },
     handleTabClick(tab) {
       console.log(tab);
-      console.log(tab.name)
-      switch(tab.name) {
+      console.log(tab.props.name)
+      switch(tab.props.name) {
         case 'profile':
           // 执行个人信息页签被点击时的逻辑
           break;
         case 'courses':
-          console.log(11111111111)
           this.fetchCourses();
           break;
         case 'history':
-          // 执行购课历史页签被点击时的逻辑
+          this.fetchHistory();
           break;
         case 'progress':
-          // 执行学习进度页签被点击时的逻辑
+          this.fetchHistory();
           break;
         case 'preferences':
-          // 执行喜好设置页签被点击时的逻辑
+          this.fetchHistory();
           break;
         case 'transactions':
+          this.fetchPaylist();
           // 执行交易记录页签被点击时的逻辑
           break;
         default:
@@ -187,6 +273,66 @@ export default {
           // 添加错误处理
         })
       },
+
+      fetchHistory() {
+        const users = this.username;
+        axios.get(`http://localhost:3000/api/paycourseregistration`, {
+          params: {
+            username: users
+          }
+        })
+        .then(response => {
+          this.searchResults = response.data;
+           // 对返回的数据进行处理，只保留关心的属性
+           this.transactions = response.data.map(item => ({
+            courseTitle: item.courseTitle, 
+            paymentStatus: item.paymentStatus, 
+            price: item.price
+          }));
+        })
+        .catch(error => {
+          console.error(error);
+          // 添加错误处理
+        })
+      },
+      fetchPaylist() {
+      const users = this.username;
+      axios.get(`http://localhost:3000/api/paycourseregistration`, {
+        params: {
+          username: users
+        }
+      })
+      .then(response => {
+        this.transactions = response.data;
+        // 使用 Vue 的 nextTick 方法等待 DOM 更新
+        this.$nextTick(() => {
+          // 执行可能影响布局的代码
+        });
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    }
     }
 };
 </script>
+
+
+<style scoped>
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+</style>
