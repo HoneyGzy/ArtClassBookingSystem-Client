@@ -13,7 +13,7 @@
       <button type="submit">{{ editingCourse !== null ? '保存课程' : '添加课程' }}</button>
     </form>
 
-    <div class="course-list">
+    <!-- <div class="course-list">
       <div 
         class="course-item" 
         v-for="(course, index) in courses"
@@ -28,7 +28,7 @@
         <button @click="editCourse(index)">编辑课程</button>
         <button @click="deleteCourse(index)">删除课程</button>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

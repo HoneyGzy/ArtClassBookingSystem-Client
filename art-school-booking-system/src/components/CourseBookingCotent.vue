@@ -1,7 +1,7 @@
 <template>
   <el-row :gutter="20">
     <CourseCard
-        v-for="course in courses"
+        v-for="course in pagedCourses"
         :key="course.id"
         :searchResults="[course]"
     >
@@ -10,6 +10,16 @@
       </template>
     </CourseCard>
   </el-row>
+  <transition name="fade">
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      layout="total, prev, pager, next, jumper"
+      :total="courses.length">
+    </el-pagination>
+  </transition>
   <!-- 预约课程模态框 -->
   <el-dialog
   v-model="isReserveDialogVisible"
@@ -57,7 +67,10 @@ export default {
       courses: [],
       isReserveDialogVisible: false,
       selectedCourse: {},
-      username: null
+      username: null,
+      pagedCourses:null,
+      pageSize: 12,
+      currentPage: 1
     }
   },
   created() {
@@ -69,12 +82,28 @@ export default {
       axios.get('http://localhost:3000/api/courses') // 确保使用正确的HTTP端点
         .then(response => {
           this.courses = response.data;
+          this.handlePagination(); // 处理分页
         })
         .catch(error => {
           console.error(error);
           // 添加错误处理
         })
     },
+    handlePagination() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      this.pagedCourses = this.courses.slice(start, end);
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handlePagination();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.handlePagination();
+    },
+
+
     openReserveDialog(course) {
       this.selectedCourse = course;
       this.isReserveDialogVisible = true;

@@ -2,7 +2,7 @@
     <div class="course-list">
       <el-row :gutter="20">
         <CourseCard
-            v-for="course in courses"
+            v-for="course in pagedCourses"
             :key="course.id"
             :searchResults="[course]"
         >
@@ -12,7 +12,6 @@
           </template>
         </CourseCard>
       </el-row>
-
       <!-- Modal window for course editing -->
       <div class="modal" v-if="showModal">
         <h2>编辑课程</h2>
@@ -38,6 +37,16 @@
         <button @click="closeModal">关闭窗口</button>
       </div> 
     </div>
+    <transition name="fade">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          layout="total, prev, pager, next, jumper"
+          :total="courses.length">
+      </el-pagination>
+    </transition>
 </template>
 
 <script>
@@ -47,13 +56,16 @@ import axios from 'axios';
 export default {
   name:'CourseManagerComponent',
   components: {
-    CourseCard
+    CourseCard,
   },
   data() {
     return {
       courses: [],
       showModal: false,
-      selectedCourse: null
+      selectedCourse: null,
+      pagedCourses:null,
+      pageSize: 12,
+      currentPage: 1
     }
   },
   created() {
@@ -64,10 +76,24 @@ export default {
       axios.get('http://localhost:3000/api/courses')
         .then(response => {
           this.courses = response.data;
+          this.handlePagination(); // 处理分页
         })
         .catch(error => {
           console.error(error);
         })
+    },
+    handlePagination() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      this.pagedCourses = this.courses.slice(start, end);
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handlePagination();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.handlePagination();
     },
     editCourse(course) {
       this.showModal = true;
@@ -95,7 +121,9 @@ export default {
       axios.delete(`http://localhost:3000/api/courses/${course.id}`)
         .then(response => {
           console.log(response)  
-          this.courses.splice(course, 1);
+          this.$message.success('刪除成功！');
+          this.fetchCourses();
+          // this.courses.splice(course, 1);
         })
         .catch(error => {
           console.error(error);
