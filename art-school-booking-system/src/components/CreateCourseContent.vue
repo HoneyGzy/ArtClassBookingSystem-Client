@@ -1,7 +1,6 @@
-<template>
+<!-- <template>
   <div id="course-create">
     <h2 class="management-title">创建课程</h2>
-
     <form class="course-form" @submit.prevent="saveCourse">
       <h3>{{ editingCourse !== null ? '编辑课程' : '添加新课程' }}</h3>
       <input type="text" v-model="formCourse.title" placeholder="课程标题">
@@ -12,29 +11,77 @@
       <input type="number" v-model="formCourse.price" placeholder="课程价格">
       <button type="submit">{{ editingCourse !== null ? '保存课程' : '添加课程' }}</button>
     </form>
+  </div>
+</template> -->
 
-    <!-- <div class="course-list">
-      <div 
-        class="course-item" 
-        v-for="(course, index) in courses"
-        :key="index"
-      >
-        <h3 class="item-title">{{ course.title }}</h3>
-        <p class="item-description">{{ course.description }}</p>
-        <p class="item-teacher">教师：{{ course.teacher }}</p>
-        <p class="item-duration">时长：{{ course.duration }} 分钟</p>
-        <p class="item-date">时间：{{ new Date(course.date).toLocaleString() }}</p>
-        <p class="item-price">价格：{{ course.price}} 元</p>
-        <button @click="editCourse(index)">编辑课程</button>
-        <button @click="deleteCourse(index)">删除课程</button>
-      </div>
-    </div> -->
+<template>
+  <div id="course-create">
+    <!-- <h2 class="management-title">创建课程</h2> -->
+    <el-form class="course-form" ref="formCourse" :model="formCourse" :rules="rules" label-position="top" @submit.prevent="saveCourse">
+      <h3>添加新课程</h3>
+      
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="课程标题" prop="title">
+            <el-input v-model="formCourse.title"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="教师姓名" prop="teacher">
+            <el-input v-model="formCourse.teacher"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      
+      <el-form-item label="课程描述" prop="description">
+        <el-input type="textarea" v-model="formCourse.description"></el-input>
+      </el-form-item>
+
+      <!-- 课程照片上传组件 -->
+      <el-form-item label="课程照片">
+        <el-upload
+          class="upload-demo"
+          ref="uploader"  
+          action="http://localhost:3000/upload"
+          accept=".png, .jpeg, .jpg"
+          :limit="1"
+          :on-exceed="handleExceed"
+          :before-upload="beforeUpload"
+          :file-list="fileList"
+          :data="getUploadData"
+          :auto-upload="false"  
+        >
+          <el-button size="small">选取文件</el-button>
+        </el-upload>
+      </el-form-item>
+
+      <!-- 新增的课程ID输入组件 -->
+      <el-form-item label="课程ID" prop="course_id">
+        <el-input v-model="formCourse.course_id"></el-input>
+      </el-form-item>
+      
+      <el-row :gutter="20">
+        <el-col :span="8">
+          <el-form-item label="课程时长(分钟)" prop="duration">
+            <el-input-number v-model="formCourse.duration" controls-position="right" :min="1"></el-input-number>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="开课时间" prop="date">
+            <el-input type="datetime-local" v-model="formCourse.date"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="8">
+          <el-form-item label="课程价格(元)" prop="price">
+            <el-input-number v-model="formCourse.price" controls-position="right" :min="0"></el-input-number>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      
+      <el-button type="primary" native-type="submit">添加课程</el-button>
+    </el-form>
   </div>
 </template>
-
-<!-- script部分和上例中的一样 -->
-
-<!-- style部分请根据实际需要调整，比如为新的字段添加样式，调整布局等 -->
 
 <script>
 
@@ -47,13 +94,49 @@ export default {
       courses: [],
       formCourse: {
         title: '',
-        description: ''
+        description: '',
+        photo: null,  // 用于在提交时上传的文件
+        course_id: ''
       },
-      editingCourse: null
+      fileList: [],
+      
     }
   },
   methods: {
+    getUploadData() {
+      return { course_id: this.formCourse.course_id };
+    },
+
+    handleExceed(files) {
+      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个。`);
+    },
+    beforeUpload(file) {
+      const isJPEG = file.type === 'image/jpeg';
+      const isJPG = file.type === 'image/jpg';
+      const isPNG = file.type === 'image/png';
+      const isLt5M = file.size / 1024 / 1024 < 5;
+
+      if (!isJPEG && !isJPG && !isPNG) {
+        this.$message.error('上传图片只能是 JPG 格式!');
+      }
+      if (!isLt5M) {
+        this.$message.error('上传图片大小不能超过 2MB!');
+      }
+      return (isJPG || isJPEG || isPNG) && isLt5M;
+    },
+
+    handleAvatarSuccess(response, file) {
+      console.log(response,file)
+      this.isUploaded = true;  // 当上传成功后，更改状态量
+    },
+  
+
     saveCourse() {
+
+      // 先上传图片
+      this.$refs.uploader.submit();
+
+
       axios.post('http://localhost:3000/courses', this.formCourse)
       .then(response => {
         console.log(response);
@@ -82,24 +165,78 @@ export default {
           duration: 3000
         });
       });
-    },
-    editCourse(index) {
-      this.formCourse = { ...this.courses[index] };
-      this.editingCourse = index;
-    },
-    deleteCourse(index) {
-      this.courses.splice(index, 1);
-      if (this.editingCourse === index) {
-        this.formCourse = { title: '', description: '' };
-        this.editingCourse = null;
-      }
     }
+
   }
 }
 </script>
 
-<!-- CSS 样式见上一回 -->
 
+<style scoped>
+/* 在此处添加自定义样式 */
+.management-title {
+  font-size: 30px;
+  color: #20a0ff;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.course-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.el-form-item__label {
+  color: #606266;
+  font-weight: 600;
+}
+
+.el-input, .el-input-number {
+  width: 100%;
+}
+
+.el-form-item__content {
+  line-height: normal;
+}
+
+.el-row {
+  margin-bottom: 18px;
+}
+
+.el-button {
+  margin-top: 20px;
+}
+
+.el-button--primary {
+  background-color: #20a0ff;
+  border-color: #20a0ff;
+}
+
+.avatar-uploader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar-preview {
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-left: 10px;
+  text-align: center;
+  line-height: 98px;
+}
+
+.avatar-preview img {
+  width: 100%;
+  height: 100%;
+}
+</style>
+
+<!-- CSS 样式见上一回 -->
+<!-- 
 <style scoped>
 #course-create {
   padding: 20px;
@@ -191,4 +328,4 @@ export default {
   flex: 0 0 calc(33.33% - 10px); /* Flexbox solution: This sizes the items to take up one third of the container's width minus the 10px gap */
   margin-bottom: 10px; /* This adds spacing below the items */
 }
-</style>
+</style> -->
