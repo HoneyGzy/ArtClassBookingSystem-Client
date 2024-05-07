@@ -54,10 +54,10 @@
           <span>评价管理</span>
         </el-menu-item>
 
-        <el-menu-item index="9"  @click="handleNavSelection('9')">
+        <!-- <el-menu-item index="9"  @click="handleNavSelection('9')">
           <el-icon><user /></el-icon>
           <span>用户中心</span>
-        </el-menu-item>
+        </el-menu-item> -->
       </el-menu>
     </el-aside>
     <el-main class="content-display">

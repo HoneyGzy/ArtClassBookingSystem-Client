@@ -157,7 +157,7 @@ export default {
 
         // 如果返回的是价格长度过长的错误
         if (error.response && error.response.data && error.response.data.error === '价格长度过长') {
-          errorMessage = '价格范围为0-999，请删减后再试';
+          errorMessage = '价格范围为0-999, 请删减后再试';
         }
         this.$message({
           message: errorMessage,

@@ -1,7 +1,7 @@
 <template>
   <div id="hot-recommend">
     <h2 class="recommend-title">热门推荐</h2>
-    <el-carousel interval="3000" arrow="always">
+    <el-carousel interval="2000" arrow="always">
       <el-carousel-item
         v-for="(item, index) in hotList"
         :key="index"
@@ -16,7 +16,7 @@
           <h3 class="item-title">{{ item.title }}</h3>
         </div>
       </el-carousel-item>
-   </el-carousel>
+    </el-carousel>
   </div>
 </template>
 
@@ -44,6 +44,10 @@ export default {
       fetchCourses() {
         axios.get('http://localhost:3000/api/courses_images')
           .then(response => {
+            if(!response.data || !Array.isArray(response.data)) {
+              console.error("Invalid API response");
+              return;
+            }
             this.hotList = response.data.map(course => {
               if (course.image && course.image.data) {
                 // Convert the ASCII values in the array to a string
@@ -69,6 +73,18 @@ export default {
 </script>
 
 <style scoped>
+
+.item-title {
+  color: rgb(15, 10, 10);  /* 给title加上颜色以便看清是否被渲染 */
+  /* border: 1px solid black;   */
+}
+
+.item-image {
+  /* 定义image的宽和高 */
+  width: 800px;  /* 你可以修改为你想要的像素值或者百分比 */
+  height: 700px;  /* 你可以修改为你想要的像素值或者百分比 */
+}
+
 #hot-recommend {
   padding: 20px;
 }
@@ -77,13 +93,15 @@ export default {
   margin-bottom: 20px;
   font-size: 2em;
 }
-.item-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+
+.el-carousel, .el-carousel-item {
+  height: 800px; /* or try a fixed height like 400px */
 }
-.item-title {
-  text-align: center;
-  padding: 15px;
+
+#hot-recommend .el-carousel .el-carousel__item.is-active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
 }
 </style>

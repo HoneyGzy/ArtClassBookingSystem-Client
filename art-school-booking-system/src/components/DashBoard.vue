@@ -236,7 +236,6 @@ export default {
 
 <style scoped>
 
-
  .nav-button {
         display: flex;
         flex-direction: column;
