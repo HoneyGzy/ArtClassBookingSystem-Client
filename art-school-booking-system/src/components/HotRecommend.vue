@@ -37,7 +37,7 @@ export default {
    created() {
     this.fetchCourses();
   },
-   methods: {
+  methods: {
       redirectItem(link) {
          window.location.href = link;
       },
