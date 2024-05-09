@@ -33,20 +33,6 @@
           <h2 class="section-title">近期热门课程推荐</h2>
           
           <!-- 图片轮播区域 -->
-          <!-- <el-carousel trigger="click" arrow="always">
-            <el-carousel-item v-for="(item, index) in hotList" :key="index">
-              <div class="carousel-item-container">
-                <div class="carousel-item">
-                  <img :src="item.image" alt="" class="carousel-item-img">
-                  <p>{{ item.title }}</p>
-                </div>
-                <div class="carousel-item" v-if="hotList[index + 1]">
-                  <img :src="hotList[index + 1].image" alt="" class="carousel-item-img">
-                  <p>{{ hotList[index + 1].title }}</p>
-                </div>
-              </div>
-            </el-carousel-item>
-          </el-carousel> -->
           <el-carousel trigger="click" arrow="always">
             <el-carousel-item v-for="(item, index) in chunkedHotList" :key="index">
               <div class="carousel-item-container">
@@ -60,7 +46,21 @@
         </div>
       </div>
 
-      
+      <!-- 艺术课程分类 -->
+      <div class="course-category-section">
+        <div class="wrapper">
+          <h2 class="section-title">艺术课程分类</h2>
+          <!-- 网格布局 -->
+          <el-row :gutter="20">
+              <el-col :span="6" v-for="(item, idx) in categories" :key="idx">
+                  <el-card>
+                      <img :src="item.image" :alt="item.alt" class="category-image">
+                      <p>{{ item.description }}</p>
+                  </el-card>
+              </el-col>
+          </el-row>
+        </div>
+      </div>
 
       <!-- 最新通知 -->
       <div class="announcement-section">
@@ -108,7 +108,18 @@ export default {
         { logo: require('@/assets/icon/icons8-registration-100.png'), content: '我们优化购课流程，选课到支付一步到位。同时，我们支持多种在线支付手段，让购课更方便。' },
         { logo: require('@/assets/icon/icons8-comments-100.png'), content: '用户可以对课程或教师进行评价，以便我们根据评价反馈改进课程质量。' },
         { logo: require('@/assets/icon/icons8-user-100.png'), content: '在用户中心，用户可以管理个人资料，查看课程预约和购买历史，跟踪学习进度，设置喜好，查看交易记录和消费详情' },
-      ]
+      ],
+      categories: [
+        {image: require('@/assets/icon/icons8-music-100.png'),alt: '音乐',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-ballet-dancer-100.png'),alt: '舞蹈',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-draw-100.png'),alt: '绘画',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-calligraphy-100.png'),alt: '书法',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-design-100.png'),alt: '设计',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-statue-of-liberty-100.png'),alt: '雕塑',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-photo-100.png'),alt: '摄影',description: '探索油画世界，捕捉生活中的色彩。' },
+        {image: require('@/assets/icon/icons8-violin-100.png'),alt: '乐器',description: '探索油画世界，捕捉生活中的色彩。' },
+      // 其他类别数据...
+    ],
     };
   },
   created() {
