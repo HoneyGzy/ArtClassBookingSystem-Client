@@ -3,6 +3,7 @@ import LoginComponent from '../components/Login.vue'; // 确保这个路径正�
 import DashboardComponent from '@/components/DashBoard.vue'; // 确保这个路径正确无误
 import MainContentComponent  from '../components/MainContentForVisit.vue';
 import AdminDashBoard from '@/components/AdminDashBoard.vue';
+import StudentDashBoard from '@/components/StudentContent.vue';
 
 // 路由定义...
 const routes = [
@@ -21,6 +22,11 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: DashboardComponent
+  },
+  {
+    path: '/StudentDashboard',
+    name: 'StudentDashboard',
+    component: StudentDashBoard
   },
   // 你可以添加更多的路由规则
   {

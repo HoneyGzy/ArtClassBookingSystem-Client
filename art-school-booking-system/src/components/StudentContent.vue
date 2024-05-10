@@ -8,9 +8,9 @@
       </div>
 
       <!-- 注册和登录按钮 -->
-      <div class="auth-buttons">
-        <el-button class="register" type="primary">注册</el-button>
-        <el-button class="login" type="primary" @click="handleLogin">登录</el-button>
+      <div class="user-info">
+        <span class="username">欢迎您：{{ username }}</span>
+        <el-button type="primary" class="logout-button" @click="logout">退出</el-button>
       </div>
     </el-header>
 
@@ -163,6 +163,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      username: null,
       form: {
         name: '',
         phone: '',
@@ -206,12 +207,22 @@ export default {
   },
   created() {
     this.fetchCourses();
+    this.setUserName();
   },
   methods: {
-      handleLogin() {
-        this.$router.push('/login');
+      logout() {
+        // 清除localStorage中的用户数据
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userToken');
+        // 使用Vue Router重定向到登录页面
+        this.$router.push({ name: 'Login' });
       },
-
+      setUserName()
+      {
+        // 从 localStorage 获取用户角色
+        this.username = localStorage.getItem('userName');
+        console.log('Current user name:', this.username);
+      },
 
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
@@ -344,16 +355,6 @@ export default {
   /* 按钮共同样式 */
 }
 
-/* 单独为注册和登录按钮定制的样式 */
-.auth-buttons .register {
-
-}
-
-.auth-buttons .login {
-  /* 特定于登录按钮的样式 */
-
-}
-
 .wrapper {
   
   margin: 0 auto;
@@ -475,5 +476,21 @@ export default {
 .contact-title
 {
   margin-top: 20px;
+}
+
+
+.logout-button {
+  padding: 5px 15px;
+  color: #fff;
+  background-color: #070420; /* 按钮背景颜色 */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  margin-left:20px;
+}
+
+.logout-button:hover {
+  background-color: #004d40;
 }
 </style>

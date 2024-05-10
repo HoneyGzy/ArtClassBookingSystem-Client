@@ -293,15 +293,6 @@ export default {
   margin-right: 20px; /* 与退出按钮之间的距离 */
 }
 
-.logout-button {
-  padding: 5px 15px;
-  color: #fff;
-  background-color: #070420; /* 按钮背景颜色 */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  outline: none;
-}
 
 .logout-button:hover {
   background-color: #004d40;

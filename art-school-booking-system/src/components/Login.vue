@@ -1,6 +1,9 @@
 <template>
-  <div class="login-container">
+  <div class="header-container">
+    <div class="logo"></div>
     <h1 class="login-title">艺术学校约课管理系统</h1>
+  </div>
+  <div class="login-container">
     <form class="login-form" @submit.prevent="handleLogin" v-if="!isRegistering">
       <!-- 在这里显示错误消息 -->
       <p v-if="loginError" class="error-message">{{ loginError }}</p>
@@ -33,12 +36,12 @@
           required
         />
       </div>
-      <div class="form-group button-group">
-        <button type="submit" class="login-button">登录</button>
+      <div class="button-group">
+        <button type="submit" class="login-button">立即登录</button>
         <button type="button" class="register-button" @click="switchToRegister">注册</button>
       </div>
     </form>
-
+  
     <!--注册页面 -->
     <form class="register-form" @submit.prevent="handleRegister" v-if="isRegistering" autocomplete="off">
       <h2>注册页面</h2>
@@ -71,7 +74,7 @@
       </div>
       <!--添加注册和返回登录按钮 -->
       <div class="form-group button-group">
-          <button type="submit" class="register-button">注册</button>
+          <button type="submit" class="register-button">还没有账号?立即注册</button>
           <button type="button" class="back-button" @click="switchToLogin">返回登录</button>
       </div>
     </form>
@@ -131,7 +134,8 @@ export default {
           this.$router.push('/adminDashboard');
         } else {
           // 否则跳转到普通用户页面
-          this.$router.push('/dashboard');
+          //this.$router.push('/dashboard');
+          this.$router.push('/StudentDashboard');
         }
       } catch (error) {
         // 如果请求失败，处理错误情况
@@ -291,7 +295,7 @@ export default {
 }
 
 .button-group {
-  display: flex;
+  /* display: flex; */
   justify-content: space-around;
 }
 
@@ -333,4 +337,23 @@ export default {
 }
 
 
+
+.header-container {
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
+}
+
+
+
+.logo {
+  /* Logo样式，根据需求来定义尺寸 */
+  background-image: url('~@/assets/b9871091f1591d50.png');
+  background-size: cover;
+  justify-content: center;
+  height: 138px;
+  width: 670px;
+  margin-top: 250px;
+  margin-bottom: 20px;
+}
 </style>
