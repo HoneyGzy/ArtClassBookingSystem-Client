@@ -36,9 +36,9 @@
           required
         />
       </div>
-      <div class="button-group">
+      <div class="form-group button-group">
         <button type="submit" class="login-button">立即登录</button>
-        <button type="button" class="register-button" @click="switchToRegister">注册</button>
+        <button type="button" class="register-button" @click="switchToRegister">还没有账号?立即注册</button>
       </div>
     </form>
   
@@ -74,7 +74,7 @@
       </div>
       <!--添加注册和返回登录按钮 -->
       <div class="form-group button-group">
-          <button type="submit" class="register-button">还没有账号?立即注册</button>
+          <button type="submit" class="register-button">注册</button>
           <button type="button" class="back-button" @click="switchToLogin">返回登录</button>
       </div>
     </form>
@@ -266,7 +266,7 @@ export default {
 
 .login-button {
   padding: 0.75em 1.5em;
-  background-color: #7b1fa2; /* 艺术学校主题色 */
+  background-color: #509cff; /* 艺术学校主题色 */
   color: white;
   border: none;
   border-radius: 4px;
@@ -275,13 +275,13 @@ export default {
 }
 
 .login-button:hover {
-  background-color: #6a1b9a; /* 鼠标悬停颜色加深 */
+  background-color: #001b96; /* 鼠标悬停颜色加深 */
 }
 
 .register-button
 {
   padding: 0.75em 1.5em;
-  background-color: #7b1fa2; /* 艺术学校主题色 */
+  background-color: #509cff; /* 艺术学校主题色 */
   color: white;
   border: none;
   border-radius: 4px;
@@ -291,11 +291,11 @@ export default {
 }
 
 .register-button:hover {
-  background-color: #6a1b9a; /* 鼠标悬停颜色加深 */
+  background-color: #001b96; /* 鼠标悬停颜色加深 */
 }
 
 .button-group {
-  /* display: flex; */
+  display: flex;
   justify-content: space-around;
 }
 

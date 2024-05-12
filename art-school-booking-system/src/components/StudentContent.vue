@@ -18,14 +18,14 @@
       <!-- 标题展示 -->
       <div class="title-image"></div>
 
-      <el-row :gutter="20" class="content-display">
+      <!-- <el-row :gutter="20" class="content-display">
           <el-col :span="6" v-for="(card, i) in cards" :key="i">
               <el-card>
                   <img :src="card.logo">
                   <p>{{ card.content }}</p>
               </el-card>
           </el-col>
-      </el-row>
+      </el-row> -->
 
       <!-- 近期热门课程推荐 -->
       <div class="hot-course-section">
@@ -49,11 +49,11 @@
       <!-- 艺术课程分类 -->
       <div class="course-category-section">
         <div class="wrapper">
-          <h2 class="section-title">艺术课程分类</h2>
+          <h2 class="section-title">查看现有课程</h2>
           <!-- 网格布局 -->
           <el-row :gutter="20">
-              <el-col :span="6" v-for="(item, idx) in categories" :key="idx">
-                  <el-card>
+              <el-col :span="6" v-for="(item, idx) in course_categories" :key="idx">
+                  <el-card @click="handleCardClick(idx)">
                       <img :src="item.image" :alt="item.alt" class="category-image">
                       <p>{{ item.description }}</p>
                   </el-card>
@@ -61,6 +61,28 @@
           </el-row>
         </div>
       </div>
+
+      <el-dialog v-model="dialogVisible" width="50%" :before-close="handleClose">
+          <span>你点击了 {{ clickedCardIndex + 1 }} 号卡片</span>
+          <el-row :gutter="20">
+            <CourseCard :searchResults="pagedResults"/>
+          </el-row>
+          <transition name="fade">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="currentPage"
+              :page-size="pageSize"
+              layout="total, prev, pager, next, jumper"
+              :total="searchResults.length">
+            </el-pagination>
+          </transition>
+
+          <template #footer>
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+          </template>
+      </el-dialog>
 
       <div class="annotation-container">
         <!-- 最新通知 -->
@@ -159,8 +181,59 @@
 <script>
 
 import axios from 'axios';
+import { ref, reactive } from 'vue';
+import CourseCard from './CourseCard.vue';
+
 // Vue 组件
 export default {
+  components: {
+    CourseCard
+  },
+
+  setup() {
+    const dialogVisible = ref(false);
+    const clickedCardIndex = ref(null);
+    const courses = reactive([]);
+
+    const categories = ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'];
+
+    const handleCardClick = async (idx) => {
+      // 获取类别的名称
+      const clickedCategory = categories[idx];
+      // 使用axios向服务器发出请求，获取课程数据
+      try {
+        const response = await axios.get(`http://localhost:3000/courses?type=${clickedCategory}`);
+        courses.value = response.data; // 填充课程数据
+        this.searchResults = courses;
+      } catch (error) {
+        console.error(error);
+        this.$message({
+          message: `加载分类 ${clickedCategory} 的课程失败`,
+          type: 'error',
+          duration: 3000
+        });
+      }
+
+      clickedCardIndex.value = idx; // 设置为点击的卡片的下标
+      dialogVisible.value = true; // 打开对话框
+    };
+
+    const handleClose = (done) => {
+      dialogVisible.value = false;
+      done();
+    };
+
+    return {
+      dialogVisible,
+      clickedCardIndex,
+      courses,
+      categories,
+      handleCardClick,
+      handleClose,
+    };
+  },
+
+
   data() {
     return {
       username: null,
@@ -183,7 +256,7 @@ export default {
         { logo: require('@/assets/icon/icons8-comments-100.png'), content: '用户可以对课程或教师进行评价，以便我们根据评价反馈改进课程质量。' },
         { logo: require('@/assets/icon/icons8-user-100.png'), content: '在用户中心，用户可以管理个人资料，查看课程预约和购买历史，跟踪学习进度，设置喜好，查看交易记录和消费详情' },
       ],
-      categories: [
+      course_categories: [
         {image: require('@/assets/icon/icons8-music-100.png'),alt: '音乐',description: '音乐' },
         {image: require('@/assets/icon/icons8-ballet-dancer-100.png'),alt: '舞蹈',description: '舞蹈' },
         {image: require('@/assets/icon/icons8-draw-100.png'),alt: '绘画',description: '绘画' },
@@ -202,21 +275,54 @@ export default {
           { title: "资讯标题2", date: "2024-05-09" },
           { title: "资讯标题2", date: "2024-05-09" },
           // 添加更多资讯
-        ],
+      ],
+      searchResults: [],
+      pagedResults: [],
+      pageSize: 12,
+      currentPage: 1
     };
   },
   created() {
     this.fetchCourses();
     this.setUserName();
+    this.fetchMusicCourses();
   },
+  
   methods: {
-      logout() {
-        // 清除localStorage中的用户数据
-        localStorage.removeItem('userRole');
-        localStorage.removeItem('userToken');
-        // 使用Vue Router重定向到登录页面
-        this.$router.push({ name: 'Login' });
-      },
+    fetchMusicCourses() {
+        axios.get('http://localhost:3000/api/courses') // 确保使用正确的HTTP端点
+          .then(response => {
+            this.searchResults = response.data;
+            this.handlePagination(); // 处理分页
+          })
+          .catch(error => {
+            console.error(error);
+            // 添加错误处理
+          })
+    },
+    handlePagination() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      this.pagedResults = this.searchResults.slice(start, end);
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handlePagination();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.handlePagination();
+    },
+
+
+
+    logout() {
+      // 清除localStorage中的用户数据
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userToken');
+      // 使用Vue Router重定向到登录页面
+      this.$router.push({ name: 'Login' });
+    },
       setUserName()
       {
         // 从 localStorage 获取用户角色
@@ -482,7 +588,7 @@ export default {
 .logout-button {
   padding: 5px 15px;
   color: #fff;
-  background-color: #070420; /* 按钮背景颜色 */
+  background-color: #1767fd; /* 按钮背景颜色 */
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -491,6 +597,6 @@ export default {
 }
 
 .logout-button:hover {
-  background-color: #004d40;
+  background-color: #111aa0;
 }
 </style>

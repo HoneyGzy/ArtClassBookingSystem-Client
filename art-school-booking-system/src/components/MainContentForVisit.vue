@@ -53,7 +53,7 @@
           <!-- 网格布局 -->
           <el-row :gutter="20">
               <el-col :span="6" v-for="(item, idx) in categories" :key="idx">
-                  <el-card>
+                  <el-card class = "course-sorts">
                       <img :src="item.image" :alt="item.alt" class="category-image">
                       <p>{{ item.description }}</p>
                   </el-card>
@@ -397,10 +397,15 @@ export default {
 
 .el-card {
      height: 300px; /* 或你想要设置的其他值 */
-     transition: transform 0.3s ease-in-out;
+     /* transition: transform 0.3s ease-in-out; */
+}
+.course-sorts
+{
+  transition: transform 0.3s ease-in-out;
+
 }
 
-.el-card:hover {
+.course-sorts:hover {
   transform: scale(1.05);
 }
 
