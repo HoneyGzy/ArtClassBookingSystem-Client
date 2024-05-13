@@ -3,10 +3,10 @@
     <!-- 欢迎区域 -->
     <el-header class="header-background">
       <!-- Logo区域 -->
-      <div class="logo">
-        <!-- <img src="path_to_logo_image" alt="艺术学校Logo" /> -->
+      <div class="logo"></div>
+      <div>
+        <SearchComponent />
       </div>
-
       <!-- 注册和登录按钮 -->
       <div class="user-info">
         <span class="username">欢迎您：{{ username }}</span>
@@ -253,6 +253,7 @@ import CourseCard from './CourseCard.vue';
 import CourseRegistration from './CourseRegistration.vue';
 import EvaluationManagement from './EvaluationManagement.vue';
 import UsercenterCoponent from'./UserCenter.vue';
+import SearchComponent from './SearchContent.vue'
 
 // Vue 组件
 export default {
@@ -260,7 +261,8 @@ export default {
     CourseCard,
     CourseRegistration,
     EvaluationManagement,
-    UsercenterCoponent
+    UsercenterCoponent,
+    SearchComponent 
   },
   data() {
     return {
