@@ -17,23 +17,47 @@
           <el-divider></el-divider>
   
           <div class="meta">
-            <div class="content-field">
-              <el-tag size="small" effect="plain">教师</el-tag>
-              <el-tag>{{ result.teacher }}</el-tag>
+            <div class="column">
+              <div class="content-field">
+                <el-tag size="small" effect="plain">教师</el-tag>
+                <el-tag>{{ result.teacher }}</el-tag>
+              </div>
+              <div class="content-field">
+                <el-tag size="small" effect="plain">时长</el-tag>
+                <el-tag type="success">{{ result.duration }} 分钟</el-tag>
+              </div>
+              <div class="content-field">
+                <el-tag size="small" effect="plain">日期</el-tag>
+                <el-tag type="info">{{ new Date(result.date).toLocaleDateString() }}</el-tag>
+              </div>
+              <div class="content-field">
+                  <el-tag size="small" effect="plain">价格</el-tag>
+                  <el-tag type="warning">¥{{ result.price }}</el-tag>
+              </div>
             </div>
-            <div class="content-field">
-              <el-tag size="small" effect="plain">时长</el-tag>
-              <el-tag type="success">{{ result.duration }} 分钟</el-tag>
-            </div>
-            <div class="content-field">
-              <el-tag size="small" effect="plain">日期</el-tag>
-              <el-tag type="info">{{ new Date(result.date).toLocaleDateString() }}</el-tag>
-            </div>
-            <div class="content-field">
-                <el-tag size="small" effect="plain">价格</el-tag>
-                <el-tag type="warning">¥{{ result.price }}</el-tag>
+            <div class="column">
+              <div class="content-field">
+                  <el-tag size="small" effect="plain">分类</el-tag>
+                  <!-- 这里假设result.category是你的课程类别 -->
+                  <el-tag>{{ result.category }}</el-tag>
+              </div>
+              <div class="content-field">
+                  <el-tag size="small" effect="plain">难度</el-tag>
+                  <!-- 这里假设result.level是你的课程难度等级 -->
+                  <el-tag>{{ result.difficulty }}</el-tag>
+              </div>
+              <div class="content-field">
+                  <el-tag size="small" effect="plain">推荐年龄</el-tag>
+                  <!-- 这里假设result.age是你的课程推荐年龄 -->
+                  <el-tag>{{ result.recommended_age }}岁</el-tag>
+              </div>
+              <div class="content-field">
+                <el-tag size="small" effect="plain">课程编号</el-tag>
+                <!-- 这里假设result.age是你的课程推荐年龄 -->
+                <el-tag>{{ result.course_id }}</el-tag>
             </div>
           </div>
+        </div>
           <slot name="extra"></slot>
         </div>
       </el-card>
@@ -43,11 +67,15 @@
 <script>
 export default {
 props: {
-    searchResults: {
-      type: Array,
-      required: true
-        }
+  searchResults: {
+    type: Array,
+    required: true
     }
+},
+created() {
+  console.log(this.searchResults);
+},
+
 }
 </script>
 
@@ -77,4 +105,13 @@ props: {
   margin-top: auto; /* 使用自动外边距将meta部分推到底部 */
 }
   
+.meta {
+  display: flex;
+  justify-content: space-between;
+}
+
+.column {
+  flex: 1;
+}
+
 </style>

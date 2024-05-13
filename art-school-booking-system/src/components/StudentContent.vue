@@ -65,7 +65,13 @@
       <el-dialog v-model="dialogVisible" width="50%" :before-close="handleClose">
           <span>现在可预约的{{ course_categories[clickedCardIndex].description}}课程</span>
           <el-row :gutter="20">
-            <CourseCard :searchResults="pagedResults"/>
+            <CourseCard  v-for="course in pagedResults"
+            :key="course.id"
+            :searchResults="[course]">
+              <template #extra>
+                <el-button type="primary" @click="openReserveDialog(course)">预约课程</el-button>
+              </template>
+            </CourseCard>
           </el-row>
           <transition name="fade">
             <el-pagination
@@ -82,6 +88,38 @@
             <el-button @click="dialogVisible = false">取消</el-button>
             <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
           </template>
+      </el-dialog>
+
+      <!-- 预约课程模态框 -->
+      <el-dialog
+      v-model="isReserveDialogVisible"
+      width="40%"
+      >
+      <div class="dialog-container">
+        <h2 class="dialog-title">课程预约</h2>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <div class="dialog-item">
+              <span class="dialog-item-title">课程名称：</span>
+              <el-tag>{{ selectedCourse.title }}</el-tag>
+            </div>
+          </el-col>
+          <el-col :span="24">
+            <div class="dialog-item">
+              <span class="dialog-item-title">教师：</span>
+              <el-tag>{{ selectedCourse.teacher }}</el-tag>
+            </div>
+          </el-col>
+        </el-row>
+        <!-- 添加更多课程信息和预约表单 -->
+      </div>
+      <template #footer>
+        <el-button class="dialog-button" @click="isReserveDialogVisible = false">取消</el-button>
+        <el-button class="dialog-button" type="primary" @click="submitReserve">
+          <i class="el-icon-check"></i>
+          确认预约
+        </el-button>
+      </template>
       </el-dialog>
 
       <div class="annotation-container">
@@ -240,13 +278,17 @@ export default {
       searchResults: [],
       pagedResults: [],
       pageSize: 12,
-      currentPage: 1
+      currentPage: 1,
+
+      isReserveDialogVisible: false,
+      selectedCourse: {},
     };
   },
   created() {
     this.fetchCourses();
     this.setUserName();
     // this.fetchMusicCourses();
+    this.useusername = localStorage.getItem('userName');
   },
   
   methods: {
@@ -285,6 +327,12 @@ export default {
       this.currentPage = val;
       this.handlePagination();
     },
+    openReserveDialog(course) {
+      this.selectedCourse = course;
+      this.isReserveDialogVisible = true;
+    },
+
+
     logout() {
       // 清除localStorage中的用户数据
       localStorage.removeItem('userRole');
@@ -352,6 +400,43 @@ export default {
       //this.$router.push({ name: 'CourseDetail', params: { id: subItem.id}})
       // name是路由名，id是参数，你可以根据你的需要进行修改
     },
+    async submitReserve() {
+      try {
+        // 提取出用户名和课程ID
+        const users = this.useusername;
+        const courseId = this.selectedCourse.id;
+        const courseTitle = this.selectedCourse.title;
+
+        // 发送预约请求
+        const response = await axios.post('http://localhost:3000/api/postReservation', {
+          users,
+          courseId,
+          courseTitle
+        });
+
+        // 判断预约状态，如果预约成功则使用你的原始逻辑，如果预约失败则使用新的逻辑
+        if (response.data.status === "error") {
+          // 抛出错误，调用catch块中的错误处理
+          throw response.data.message;
+        } else {
+          // 解析响应
+          const { reservationStatus, courseTime } = response.data;
+
+          // 更新预约状态
+          this.isReserveDialogVisible = false;
+          this.reservationStatus = reservationStatus;
+          this.courseTime = courseTime;
+
+          // 显示成功消息
+          this.$message.success('预约成功！等待管理员处理');
+        }
+
+      } catch (error) {
+        console.error(error);
+        // 使用后端返回的错误消息
+        this.$message.error(error);
+      }
+    }
   }
 };
 

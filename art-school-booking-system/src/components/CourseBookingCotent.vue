@@ -22,9 +22,9 @@
   </transition>
   <!-- 预约课程模态框 -->
   <el-dialog
-  v-model="isReserveDialogVisible"
-  width="40%"
->
+    v-model="isReserveDialogVisible"
+    width="40%"
+  >
   <div class="dialog-container">
     <h2 class="dialog-title">课程预约</h2>
     <el-row :gutter="20">
