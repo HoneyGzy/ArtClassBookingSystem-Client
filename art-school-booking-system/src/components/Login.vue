@@ -132,9 +132,10 @@ export default {
         // 如果返回的数据中有 adminFlag 并且值为 true，那么跳转到管理员页面
         if (response.data.adminFlag) {
           this.$router.push('/adminDashboard');
-        } else {
+        } else if (response.data.teacherFlag) {
           // 否则跳转到普通用户页面
-          //this.$router.push('/dashboard');
+          this.$router.push('/dashboard');
+        }else{
           this.$router.push('/StudentDashboard');
         }
       } catch (error) {

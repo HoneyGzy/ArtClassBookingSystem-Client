@@ -36,7 +36,7 @@
           <el-carousel trigger="click" arrow="always">
             <el-carousel-item v-for="(item, index) in chunkedHotList" :key="index">
               <div class="carousel-item-container">
-                <div class="carousel-item" v-for="(subItem, subIndex) in item" :key="`subItem-${subIndex}`" @click="handleClick(subItem)">
+                <div class="carousel-item" v-for="(subItem, subIndex) in item" :key="`subItem-${subIndex}`" @click="handleImageClick(subItem)">
                   <img :src="subItem.image" alt="" class="carousel-item-img">
                   <p>{{ subItem.title }}</p>
                 </div>        
@@ -178,6 +178,36 @@
         </div>
       </div>
 
+      <!-- 快捷入口 -->
+      <div class="course-category-section">
+        <div class="wrapper">
+          <h2 class="section-title">快捷入口</h2>
+          <el-row :gutter="20" class="content-display">
+              <el-col :span="8" v-for="(card, i) in cards" :key="i"  @click="handleClick(i)">
+                  <el-card>
+                      <img :src="card.logo">
+                      <p>{{ card.content }}</p>
+                  </el-card>
+              </el-col>
+          </el-row>
+           <!-- 模态框 -->
+          <el-dialog
+            v-model="fastentrydialogVisible"
+            :width="dialogWidth">
+            <course-registration v-if="currentIndex === 0"></course-registration>
+            <evaluation-management v-else-if="currentIndex === 1"></evaluation-management>
+            <usercenter-coponent  v-else-if="currentIndex === 2"></usercenter-coponent>
+
+            <span>{{ dialogContent }}</span>
+            <template v-slot:footer>
+              <span class="dialog-footer">
+                <el-button @click="fastentrydialogVisible = false">关闭</el-button>
+              </span>
+            </template>
+          </el-dialog>
+        </div>
+      </div>
+
       <!-- 联系我们 -->
       <div class="quick-access-section">
           <h2 class="contact-title">联系我们</h2>
@@ -219,16 +249,22 @@
 <script>
 
 import axios from 'axios';
-// import { ref, reactive } from 'vue';
 import CourseCard from './CourseCard.vue';
+import CourseRegistration from './CourseRegistration.vue';
+import EvaluationManagement from './EvaluationManagement.vue';
+import UsercenterCoponent from'./UserCenter.vue';
 
 // Vue 组件
 export default {
   components: {
-    CourseCard
+    CourseCard,
+    CourseRegistration,
+    EvaluationManagement,
+    UsercenterCoponent
   },
   data() {
     return {
+    
       categories: ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'],
       dialogVisible: false,
       clickedCardIndex: null,
@@ -246,14 +282,9 @@ export default {
       carouselItems: [] , //新闻图片列表
       chunkedHotList: [],
       cards: [
-        { logo: require('@/assets/icon/icons8-admin-settings-male-100.png'), content: '我们提供用户注册、审核、修改和删除等操作，涵盖管理员、教师及学生/家长等用户角色，并对用户权限进行管理和统计。' },
-        { logo: require('@/assets/icon/icons8-course-100.png'), content: '我们处理课程的创建、修改、查询等操作，涉及课程名称、课程描述、课程类别、课程时间、费用等课程信息。同时支持教师创建新课程，学生和家长查询。' },
-        { logo: require('@/assets/icon/icons8-popular-100.png'), content: '根据学员行为数据、课程评分和学习倾向，我们智能推荐适合的课程，并着重推荐热门和特别活动课程。' },
-        { logo: require('@/assets/icon/icons8-search-100.png'), content: '我们提供全方位的搜索功能，包括关键词搜索、分类筛选和智能排序，快速找到课程或教师，支持模糊匹配和智能提示。' },
-        { logo: require('@/assets/icon/icons8-reserve-100.png'), content: '学员可以通过日历界面查看课程时间表，并进行试听课或一对一课程的预约。预约审核通过后，会提醒预约状态和上课时间。' },
-        { logo: require('@/assets/icon/icons8-registration-100.png'), content: '我们优化购课流程，选课到支付一步到位。同时，我们支持多种在线支付手段，让购课更方便。' },
-        { logo: require('@/assets/icon/icons8-comments-100.png'), content: '用户可以对课程或教师进行评价，以便我们根据评价反馈改进课程质量。' },
-        { logo: require('@/assets/icon/icons8-user-100.png'), content: '在用户中心，用户可以管理个人资料，查看课程预约和购买历史，跟踪学习进度，设置喜好，查看交易记录和消费详情' },
+        { logo: require('@/assets/icon/icons8-registration-100.png'), content: '购课支付' },
+        { logo: require('@/assets/icon/icons8-comments-100.png'), content: '评价中心' },
+        { logo: require('@/assets/icon/icons8-user-100.png'), content: '用户中心' },
       ],
       course_categories: [
         {image: require('@/assets/icon/icons8-music-100.png'),alt: '音乐',description: '音乐' },
@@ -282,6 +313,11 @@ export default {
 
       isReserveDialogVisible: false,
       selectedCourse: {},
+
+      fastentrydialogVisible: false, // 控制模态框的显示和隐藏
+      dialogContent: '', // 模态框中显示的内容
+      currentIndex: null
+
     };
   },
   created() {
@@ -289,6 +325,20 @@ export default {
     this.setUserName();
     // this.fetchMusicCourses();
     this.useusername = localStorage.getItem('userName');
+  },
+
+  computed: {
+    dialogWidth() {
+      switch (this.currentIndex) {
+        case 0:
+          return '30%';
+        case 1:
+          return '30%';
+        // 在这里为更多的索引设置宽度
+        default:
+          return '50%';
+      }
+    },
   },
   
   methods: {
@@ -393,12 +443,11 @@ export default {
           console.error(error);
         })
     },
-    handleClick(subItem) {
-      // 这里可以处理点击事件，subItem是点击的那个图片的数据
-      // 例如，你可以使用Vue Router来进行页面跳转：
-      console.log(subItem)
-      //this.$router.push({ name: 'CourseDetail', params: { id: subItem.id}})
-      // name是路由名，id是参数，你可以根据你的需要进行修改
+    handleClick(index) {
+      this.currentIndex = index; // 记录当前点击的index
+      this.dialogContent = this.cards[index].content; // 设置模态框中显示的内容
+      this.fastentrydialogVisible = true; // 显示模态框
+      
     },
     async submitReserve() {
       try {

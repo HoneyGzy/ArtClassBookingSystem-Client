@@ -113,8 +113,10 @@ import CourseCard from './CourseCard.vue';
 import axios from 'axios';
 
 export default {
+  name: 'UsercenterCoponent',
   components: {
-    CourseCard
+    CourseCard,
+    
   },
   data() {
     return {
