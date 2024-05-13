@@ -63,7 +63,7 @@
       </div>
 
       <el-dialog v-model="dialogVisible" width="50%" :before-close="handleClose">
-          <span>你点击了 {{ clickedCardIndex + 1 }} 号卡片</span>
+          <span>现在可预约的{{ course_categories[clickedCardIndex].description}}课程</span>
           <el-row :gutter="20">
             <CourseCard :searchResults="pagedResults"/>
           </el-row>
@@ -181,7 +181,7 @@
 <script>
 
 import axios from 'axios';
-import { ref, reactive } from 'vue';
+// import { ref, reactive } from 'vue';
 import CourseCard from './CourseCard.vue';
 
 // Vue 组件
@@ -189,53 +189,14 @@ export default {
   components: {
     CourseCard
   },
-
-  setup() {
-    const dialogVisible = ref(false);
-    const clickedCardIndex = ref(null);
-    const courses = reactive([]);
-
-    const categories = ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'];
-
-    const handleCardClick = async (idx) => {
-      // 获取类别的名称
-      const clickedCategory = categories[idx];
-      // 使用axios向服务器发出请求，获取课程数据
-      try {
-        const response = await axios.get(`http://localhost:3000/courses?type=${clickedCategory}`);
-        courses.value = response.data; // 填充课程数据
-        this.searchResults = courses;
-      } catch (error) {
-        console.error(error);
-        this.$message({
-          message: `加载分类 ${clickedCategory} 的课程失败`,
-          type: 'error',
-          duration: 3000
-        });
-      }
-
-      clickedCardIndex.value = idx; // 设置为点击的卡片的下标
-      dialogVisible.value = true; // 打开对话框
-    };
-
-    const handleClose = (done) => {
-      dialogVisible.value = false;
-      done();
-    };
-
-    return {
-      dialogVisible,
-      clickedCardIndex,
-      courses,
-      categories,
-      handleCardClick,
-      handleClose,
-    };
-  },
-
-
   data() {
     return {
+      categories: ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'],
+      dialogVisible: false,
+      clickedCardIndex: null,
+      categoryData: [],
+
+
       username: null,
       form: {
         name: '',
@@ -285,20 +246,31 @@ export default {
   created() {
     this.fetchCourses();
     this.setUserName();
-    this.fetchMusicCourses();
+    // this.fetchMusicCourses();
   },
   
   methods: {
-    fetchMusicCourses() {
-        axios.get('http://localhost:3000/api/courses') // 确保使用正确的HTTP端点
-          .then(response => {
-            this.searchResults = response.data;
-            this.handlePagination(); // 处理分页
-          })
-          .catch(error => {
-            console.error(error);
-            // 添加错误处理
-          })
+    handleCardClick(idx) {
+      this.clickedCardIndex = idx
+      this.dialogVisible = true
+      const category = this.categories[idx]
+
+      console.log(category)
+
+      // 用axios查询后端数据
+      axios.get('http://localhost:3000/courses', { params: { type: category} })
+      .then(res => {
+        if (res.status === 200) {
+          // 将查询到的数据保存在data中的categoryData字段
+          this.searchResults = res.data
+          this.handlePagination();
+        } else {
+          console.log('Error: ', res.status);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      })
     },
     handlePagination() {
       const start = (this.currentPage - 1) * this.pageSize;
@@ -313,9 +285,6 @@ export default {
       this.currentPage = val;
       this.handlePagination();
     },
-
-
-
     logout() {
       // 清除localStorage中的用户数据
       localStorage.removeItem('userRole');
@@ -323,68 +292,67 @@ export default {
       // 使用Vue Router重定向到登录页面
       this.$router.push({ name: 'Login' });
     },
-      setUserName()
-      {
-        // 从 localStorage 获取用户角色
-        this.username = localStorage.getItem('userName');
-        console.log('Current user name:', this.username);
-      },
-
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('提交成功!');
-          } else {
-            console.log('error submit!!');
-            return false;
+    setUserName()
+    {
+      // 从 localStorage 获取用户角色
+      this.username = localStorage.getItem('userName');
+      console.log('Current user name:', this.username);
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('提交成功!');
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    redirectItem(link) {
+        window.location.href = link;
+    },
+    fetchCourses() {
+      axios.get('http://localhost:3000/api/courses_images')
+        .then(response => {
+          if(!response.data || !Array.isArray(response.data)) {
+            console.error("Invalid API response");
+            return;
           }
-        });
-      },
-      redirectItem(link) {
-         window.location.href = link;
-      },
-      fetchCourses() {
-        axios.get('http://localhost:3000/api/courses_images')
-          .then(response => {
-            if(!response.data || !Array.isArray(response.data)) {
-              console.error("Invalid API response");
-              return;
-            }
-            this.hotList = response.data.map(course => {
-              if (course.image && course.image.data) {
-                // Convert the ASCII values in the array to a string
-                var imagePath = course.image.data.map(c => String.fromCharCode(c)).join('');
-                
-                // Create the URL to the image
-                course.image = 'http://localhost:3000/' + imagePath;
-                console.log(course.image)
-              }
-              console.log(`Course title: ${course.title}`);
-              console.log(`Image URL: ${course.image}`);
-
+          this.hotList = response.data.map(course => {
+            if (course.image && course.image.data) {
+              // Convert the ASCII values in the array to a string
+              var imagePath = course.image.data.map(c => String.fromCharCode(c)).join('');
               
-              return course;
-            });
-            this.carouselItems = this.hotList;
-            console.log(`hotlist: ${this.carouselItems}`);
-
-            let chunkSize = 3;
-            for (let i = 0; i < this.hotList.length; i += chunkSize) {
-              this.chunkedHotList.push(this.hotList.slice(i,i+chunkSize));
+              // Create the URL to the image
+              course.image = 'http://localhost:3000/' + imagePath;
+              console.log(course.image)
             }
-          })
-          .catch(error => {
-            console.error(error);
-          })
-      },
-      handleClick(subItem) {
-        // 这里可以处理点击事件，subItem是点击的那个图片的数据
-        // 例如，你可以使用Vue Router来进行页面跳转：
-        console.log(subItem)
-        //this.$router.push({ name: 'CourseDetail', params: { id: subItem.id}})
-        // name是路由名，id是参数，你可以根据你的需要进行修改
-      },
-   }
+            console.log(`Course title: ${course.title}`);
+            console.log(`Image URL: ${course.image}`);
+
+            
+            return course;
+          });
+          this.carouselItems = this.hotList;
+          console.log(`hotlist: ${this.carouselItems}`);
+
+          let chunkSize = 3;
+          for (let i = 0; i < this.hotList.length; i += chunkSize) {
+            this.chunkedHotList.push(this.hotList.slice(i,i+chunkSize));
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        })
+    },
+    handleClick(subItem) {
+      // 这里可以处理点击事件，subItem是点击的那个图片的数据
+      // 例如，你可以使用Vue Router来进行页面跳转：
+      console.log(subItem)
+      //this.$router.push({ name: 'CourseDetail', params: { id: subItem.id}})
+      // name是路由名，id是参数，你可以根据你的需要进行修改
+    },
+  }
 };
 
 
