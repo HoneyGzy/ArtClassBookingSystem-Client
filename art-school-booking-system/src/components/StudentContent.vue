@@ -198,7 +198,7 @@
             <evaluation-management v-else-if="currentIndex === 1"></evaluation-management>
             <usercenter-coponent  v-else-if="currentIndex === 2"></usercenter-coponent>
 
-            <span>{{ dialogContent }}</span>
+            <!-- <span>{{ dialogContent }}</span> -->
             <template v-slot:footer>
               <span class="dialog-footer">
                 <el-button @click="fastentrydialogVisible = false">关闭</el-button>
