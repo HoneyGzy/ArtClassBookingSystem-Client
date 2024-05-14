@@ -53,7 +53,7 @@
           <!-- 网格布局 -->
           <el-row :gutter="20">
               <el-col :span="6" v-for="(item, idx) in categories" :key="idx">
-                  <el-card class = "course-sorts">
+                  <el-card class = "course-sorts" @click="handleCardClick(idx)">
                       <img :src="item.image" :alt="item.alt" class="category-image">
                       <p>{{ item.description }}</p>
                   </el-card>
@@ -61,6 +61,16 @@
           </el-row>
         </div>
       </div>
+
+      <el-dialog v-model="dialogVisible" width="50%" :before-close="handleClose">
+        <span>{{ dialogContent }}</span>
+          
+
+          <template #footer>
+            <el-button @click="dialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+          </template>
+      </el-dialog>
 
       <div class="annotation-container">
         <!-- 最新通知 -->
@@ -202,6 +212,8 @@ export default {
           { title: "资讯标题2", date: "2024-05-09" },
           // 添加更多资讯
         ],
+        dialogVisible: false,
+        dialogContent: '',
     };
   },
   created() {
@@ -211,8 +223,43 @@ export default {
       handleLogin() {
         this.$router.push('/login');
       },
+      handleCardClick(idx){
+        console.log(idx)
+        this.dialogVisible = true
 
-
+        switch(idx) {
+          case 0:
+            this.dialogContent = '音乐分类：涉及到的主题广泛，从基础的音乐理论学习，到各种风格的音乐创作和编曲技巧，还有各种乐器的演奏方法等。无论你是想提高自己的音乐素养，还是想专业学习某一方面的技巧，这个分类都能满足你的需求。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 1:
+            this.dialogContent = '舞蹈分类：这里有各种不同风格的舞蹈课程，比如流行的现代舞，优雅的芭蕾舞，还有各种民族舞蹈等。学习舞蹈不仅可以提高身体协调性，还可以充实生活，增加乐趣，也是一种很好的健身方式。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 2:
+            this.dialogContent = '绘画分类：涵盖了各种技法和风格的绘画课程，包括素描，水彩，油画等。无论你是初学者，还是有一定基础的绘画爱好者，都可以在这里找到适合你的课程，学习和提高绘画技巧，发展个人艺术风格。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 3:
+            this.dialogContent = '书法分类：我们提供了各种风格的书法课程，如行书，楷书，草书等。对中国传统文化有兴趣的人可以在这里学习到书法基础知识，并且通过实际写字的过程，更深入地理解和欣赏中华书法之美。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 4:
+            this.dialogContent = '设计分类：课程内容包括平面设计，产品设计，UI设计，网页设计等。设计是一个综合性很强的领域，涉及到艺术感知，理论知识，技术应用等多个方面。在这里你可以全面提升设计能力，为未来的职业生涯打下坚实的基础。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 5:
+            this.dialogContent = '雕塑分类：涉及到使用各种物料如陶瓷，木头，石头等进行雕塑的课程。雕塑是一个立体的艺术，需要考虑到形，空间，质地等多个方面。通过学习雕塑，你可以提高空间感知能力，同时也可以从中得到艺术的享受。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 6:
+            this.dialogContent = '摄影分类：提供了从基础摄影技巧到高级后期处理的课程。摄影不仅可以记录生活，也可以是一种表达自我，发现美的方式。这里的课程会教你如何把看到的，想表达的，通过相机，呈现出来。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          case 7:
+            this.dialogContent = '乐器分类：涉及了各种乐器的演奏技巧，如钢琴，吉他，小提琴等。学习乐器不仅可以培养音乐素养，也可以锻炼协调性，增强记忆力。无论你是为了业余爱好，还是为了提升专业技能，都可以在这里找到适合你的课程。如需浏览更多详情，请注册登录系统查看。';
+            break;
+          default:
+            break;
+        }
+        // const category = this.categories[idx]
+      },
+      handleClose() {
+        this.dialogVisible = false; // 取消显示对话框
+      },
       submitForm(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {

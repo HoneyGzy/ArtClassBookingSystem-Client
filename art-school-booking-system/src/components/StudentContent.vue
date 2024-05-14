@@ -333,7 +333,7 @@ export default {
     dialogWidth() {
       switch (this.currentIndex) {
         case 0:
-          return '30%';
+          return '80%';
         case 1:
           return '30%';
         // 在这里为更多的索引设置宽度

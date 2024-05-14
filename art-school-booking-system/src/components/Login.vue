@@ -11,7 +11,7 @@
         <label for="role">角色:</label>
         <select id="role" v-model="loginForm.role" required>
           <option disabled value="">请选择角色</option>
-          <option value="student">学生</option>
+          <option value="student">学生/家长</option>
           <option value="teacher">老师</option>
           <option value="admin">管理员</option>
         </select>
