@@ -62,7 +62,7 @@
         </div>
       </div>
 
-      <el-dialog v-model="dialogVisible" width="50%" :before-close="handleClose">
+      <el-dialog v-model="dialogVisible" width="30%" :before-close="handleClose">
         <span>{{ dialogContent }}</span>
           
 
@@ -357,7 +357,7 @@ export default {
   margin-top: 20px;
 }
 .title-image{
-  background-image: url('~@/assets/art-book-school.png');
+  background-image: url('~@/assets/art-school-booking-sys.png');
   background-size: cover;
   height: 1000px;
 

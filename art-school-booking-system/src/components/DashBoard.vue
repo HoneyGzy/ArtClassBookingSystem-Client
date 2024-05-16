@@ -20,10 +20,10 @@
           default-active="1" 
           style="height: 100vh;padding: 18px"
         >
-        <el-menu-item index="1" @click="handleNavSelection('1')">
+        <!-- <el-menu-item index="1" @click="handleNavSelection('1')">
           <el-icon><home /></el-icon>
           <span>首页</span>
-        </el-menu-item>
+        </el-menu-item> -->
 
         <!-- <el-menu-item index="2" @click="handleNavSelection('2')">
           <el-icon><user-solid /></el-icon>

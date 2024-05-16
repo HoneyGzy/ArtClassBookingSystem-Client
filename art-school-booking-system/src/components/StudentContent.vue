@@ -531,7 +531,7 @@ export default {
   margin-top: 20px;
 }
 .title-image{
-  background-image: url('~@/assets/art-book-school.png');
+  background-image: url('~@/assets/art-school-booking-sys.png');
   background-size: cover;
   height: 1000px;
 
