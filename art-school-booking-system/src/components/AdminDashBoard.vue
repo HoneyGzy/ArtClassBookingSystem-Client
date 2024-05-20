@@ -17,11 +17,6 @@
           default-active="1" 
           style="height: 100vh;padding: 18px"
         >
-        <!-- <el-menu-item index="1" @click="handleNavSelection('1')">
-          <el-icon><home /></el-icon>
-          <span>首页</span>
-        </el-menu-item> -->
-
         <el-sub-menu v-if="userRole === 'admin'" index="2" class="custom-sub-menu">
           <template #title>
               <el-icon><user-solid /></el-icon>
@@ -42,10 +37,8 @@
           </template>
           <el-menu-item-group class="custom-sub-menu-title">
             <el-menu-item index="3-1"  @click="handleNavSelection('3-1')">课程列表</el-menu-item>
-            <!-- 使用 v-if 判断，只有当角色是 'teacher' 或 'admin' 时才显示 -->
-            <el-menu-item index="3-2" v-if="userRole === 'teacher' || userRole === 'admin'" @click="handleNavSelection('3-2')">创建课程</el-menu-item>
-            <!-- 使用 v-if 判断，只有当角色是 'teacher' 或 'admin' 时才显示 -->
-            <el-menu-item index="3-3" v-if="userRole === 'teacher' || userRole === 'admin'" @click="handleNavSelection('3-3')">管理课程</el-menu-item>
+            <el-menu-item index="3-2"  @click="handleNavSelection('3-2')">创建课程</el-menu-item>
+            <el-menu-item index="3-3"  @click="handleNavSelection('3-3')">管理课程</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
 
@@ -54,10 +47,16 @@
           <span>评价管理</span>
         </el-menu-item>
 
-        <!-- <el-menu-item index="9"  @click="handleNavSelection('9')">
-          <el-icon><user /></el-icon>
-          <span>用户中心</span>
-        </el-menu-item> -->
+        <el-sub-menu index="4" class="custom-sub-menu">
+          <template #title>
+            <el-icon><book /></el-icon>
+            <span>预约管理</span>
+          </template>
+          <el-menu-item-group class="custom-sub-menu-title">
+            <el-menu-item index="4-1"  @click="handleNavSelection('4-1')">待审核预约</el-menu-item>
+            <el-menu-item index="4-2"  @click="handleNavSelection('4-2')">已预约课程</el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     <el-main class="content-display">
@@ -86,6 +85,7 @@ import userlistComponent from './UserlistContent.vue'
 import UserAddComponent from './UserAddContent.vue'
 import UserUpdateComponent from './UserUpdateContent.vue'
 import UserDeletComponent from './UserDeleteContent.vue'
+import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
 export default {
@@ -106,6 +106,7 @@ export default {
     UserAddComponent,
     UserUpdateComponent,
     UserDeletComponent,
+    BookingCotentManageComponent,
 
     ElContainer,
     ElHeader,
@@ -180,14 +181,17 @@ export default {
         case '3-3':
           this.selectedCategoryComponent = 'CourseManagerComponent';
           break;
-        case '4':
-          this.selectedCategoryComponent = 'HotRecommend';
+        case '4-1':
+          this.selectedCategoryComponent = 'BookingCotentManageComponent';
+          break;
+        case '4-2':
+          this.selectedCategoryComponent = 'BookingCotentManageComponent';
           break;
         case '5':
           this.selectedCategoryComponent = 'searchComponent';
           break;
         case '6':
-          this.selectedCategoryComponent = 'CourseBookingCotent';
+          this.selectedCategoryComponent = 'BookingCotentManageComponent';
           break;    
         case '7':
           this.selectedCategoryComponent = 'CourseRegistration';

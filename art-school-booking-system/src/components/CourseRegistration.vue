@@ -5,10 +5,14 @@
       <el-col :span="15">
         <el-main>
           <h2 class="course-title">已经预约的课程</h2>
-            <CourseCard  v-for="course in pagedResults"
-            :key="course.id"
-            :searchResults="[course]">
-            </CourseCard>
+            <!-- 为课程卡片的容器添加flex样式 -->
+            <div class="course-cards-container">
+              <CourseCard
+                v-for="course in pagedResults"
+                :key="course.id"
+                :searchResults="[course]">
+              </CourseCard>
+            </div>
     
             <transition name="fade">
               <el-pagination
@@ -95,7 +99,7 @@ import CourseCard from './CourseCard.vue';
         username:null,
         searchResults: [],
         pagedResults: [],
-        pageSize: 12,
+        pageSize: 4,
         currentPage: 1,
 
         
@@ -222,30 +226,14 @@ import CourseCard from './CourseCard.vue';
   .text-area {
     height: 200px;  /* 针对文本区域调整高度 */
   }
-/* 
-  .payment-dialog {
-    background: #f5f5f5;
-    border-radius: 10px;
-    color: #333;
+  .course-cards-container {
+    display: flex; /* 设置flex布局 */
+    flex-wrap: wrap; /* 允许换行 */
+    justify-content: start; /* 从起点开始排列 */
   }
-  .payment-title {
-    color: #1f2d3d;
-    font-size: 24px;
+  .course-cards-container > * {
+    flex: 0 0 25%; /* 每个卡片占据25%的宽度 */
+    max-width: 25%; /* 设置最大宽度为25%，确保一行最多四个卡片 */
+    box-sizing: border-box; /* 包括padding和border在内的宽度计算 */
   }
-  .payment-detail {
-    color: #606266;
-    font-size: 18px;
-  }
-  .payment-instruction {
-    color: #909399;
-    font-size: 16px;
-  }
-  .payment-button {
-    background-color: #f7b824;
-    color: white;
-  }
-  .close-button {
-    background-color: #e6a23c;
-    color: white;
-  } */
 </style>
