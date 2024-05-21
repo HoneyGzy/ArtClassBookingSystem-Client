@@ -1,9 +1,12 @@
 <template>
   <el-container class="dashboard-container">
-    <el-header class="dashboard-header">
-      <h1 class="dashboard-title">艺术学校约课管理系统管理员系统</h1>
+    <el-header
+      v-bind:class="{'header-red': userRole === 'teacher', 'header-blue': userRole !== 'teacher'}"
+      class="dashboard-header"
+    >
+      <h1 class="dashboard-title">艺术学校约课管理系统</h1>
       <div class="user-info">
-        <span class="username">欢迎您:{{ username }}</span>
+        <span class="username">欢迎您：{{ username }}</span>
         <el-button type="primary" class="logout-button" @click="logout">退出</el-button>
       </div>
     </el-header>
@@ -17,46 +20,25 @@
           default-active="1" 
           style="height: 100vh;padding: 18px"
         >
-        <el-sub-menu index="2" class="custom-sub-menu">
-          <template #title>
-              <el-icon><user-solid /></el-icon>
-              <span>用户管理</span>
-          </template>
-          <el-menu-item-group class="custom-sub-menu-title">
-              <el-menu-item index="2-1" @click="handleNavSelection('2-1')">用户列表</el-menu-item>
-              <el-menu-item index="2-2" @click="handleNavSelection('2-2')">添加用户</el-menu-item>
-              <el-menu-item index="2-3" @click="handleNavSelection('2-3')">更新用户信息</el-menu-item>
-              <el-menu-item index="2-4" @click="handleNavSelection('2-4')">删除用户</el-menu-item>
-          </el-menu-item-group>
-        </el-sub-menu>
-
-        <el-sub-menu index="3" class="custom-sub-menu">
-          <template #title>
-            <el-icon><book /></el-icon>
-            <span>课程管理</span>
-          </template>
-          <el-menu-item-group class="custom-sub-menu-title">
-            <el-menu-item index="3-1"  @click="handleNavSelection('3-1')">课程列表</el-menu-item>
-            <el-menu-item index="3-2"  @click="handleNavSelection('3-2')">创建课程</el-menu-item>
-            <el-menu-item index="3-3"  @click="handleNavSelection('3-3')">管理课程</el-menu-item>
-          </el-menu-item-group>
-        </el-sub-menu>
-
-        <el-menu-item index="8" @click="handleNavSelection('8')">
-          <el-icon><comment /></el-icon>
-          <span>评价管理</span>
+        <el-menu-item index="3" @click="handleNavSelection('3')">
+          <el-icon><search /></el-icon>
+          <span>课程列表</span>
         </el-menu-item>
 
-        <el-sub-menu index="4" class="custom-sub-menu">
-          <template #title>
-            <el-icon><book /></el-icon>
-            <span>预约管理</span>
-          </template>
-          <el-menu-item-group class="custom-sub-menu-title">
-            <el-menu-item index="4-1"  @click="handleNavSelection('4-1')">待审核预约</el-menu-item>
-            <el-menu-item index="4-2"  @click="handleNavSelection('4-2')">已预约课程</el-menu-item>
-          </el-menu-item-group>
-        </el-sub-menu>
+        <el-menu-item index="5" @click="handleNavSelection('5')">
+          <el-icon><search /></el-icon>
+          <span>课程搜索</span>
+        </el-menu-item>
+
+        <el-menu-item index="6" @click="handleNavSelection('6')">
+          <el-icon><calendar /></el-icon>
+          <span>预约管理</span>
+        </el-menu-item>
+
+        <el-menu-item index="9"  @click="handleNavSelection('9')">
+          <el-icon><user /></el-icon>
+          <span>用户中心</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-main class="content-display">
@@ -81,13 +63,7 @@ import UserCenterComponent from './UserCenter.vue'
 import CourseRegistration from './CourseRegistration.vue'
 import CourseListComponent from './CourseListContent.vue'
 import CourseManagerComponent from './CourseManagerContent.vue'
-import userlistComponent from './UserlistContent.vue'
-import UserAddComponent from './UserAddContent.vue'
-import UserUpdateComponent from './UserUpdateContent.vue'
-import UserDeletComponent from './UserDeleteContent.vue'
 import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
-import AlreadyBookingCotentManageComponent from './AlreadyBookingCotentManageComponent.vue'
-
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
 export default {
@@ -104,12 +80,7 @@ export default {
     CourseRegistration,
     CourseListComponent,
     CourseManagerComponent,
-    userlistComponent,
-    UserAddComponent,
-    UserUpdateComponent,
-    UserDeletComponent,
     BookingCotentManageComponent,
-    AlreadyBookingCotentManageComponent,
 
     ElContainer,
     ElHeader,
@@ -123,7 +94,6 @@ export default {
   },
   data() {
     return {
-
       selectedCategory: '',
       categoryContent: '', 
       selectedCategoryComponent: null, // 当前选中的组件
@@ -131,6 +101,7 @@ export default {
       username: null,
     };
   },
+
   beforeRouteLeave(to, from, next) {
   console.log(from.name)
   const userRole = localStorage.getItem('userRole');
@@ -148,6 +119,7 @@ export default {
   created() {
     this.setUserRole();
     this.setUserName();
+    this.handleNavSelection('3');
   },
 
   methods: {
@@ -163,39 +135,27 @@ export default {
         case '1':
           this.selectedCategoryComponent = 'HomeContent';
           break;
-        case '2-1':
-          this.selectedCategoryComponent = "userlistComponent";
+        case '2':
+          this.selectedCategoryComponent = "UserManagerComponent";
           break;
-        case '2-2':
-          this.selectedCategoryComponent = "UserAddComponent";
-          break;
-        case '2-3':
-          this.selectedCategoryComponent = "UserUpdateComponent";
-          break;
-        case '2-4':
-          this.selectedCategoryComponent = "UserDeletComponent";
-          break;
-        case '3-1':
+        case '3':
           this.selectedCategoryComponent = "CourseListComponent";
-           break;
-        case '3-2':
-          this.selectedCategoryComponent = 'CreateCourseContent';
+          // 逻辑处理“编辑”功能
           break;
-        case '3-3':
-          this.selectedCategoryComponent = 'CourseManagerComponent';
-          break;
-        case '4-1':
-          this.selectedCategoryComponent = 'BookingCotentManageComponent';
-          break;
-        case '4-2':
-          this.selectedCategoryComponent = 'AlreadyBookingCotentManageComponent';
+        case '4':
+          this.selectedCategoryComponent = 'HotRecommend';
           break;
         case '5':
           this.selectedCategoryComponent = 'searchComponent';
           break;
         case '6':
-          this.selectedCategoryComponent = 'BookingCotentManageComponent';
-          break;    
+          if (this.userRole === 'teacher') {
+            this.selectedCategoryComponent = 'BookingCotentManageComponent';
+            break;
+          } else {
+            this.selectedCategoryComponent = 'CourseBookingCotent';
+            break;    
+          }
         case '7':
           this.selectedCategoryComponent = 'CourseRegistration';
           break;    
@@ -209,7 +169,6 @@ export default {
         // 其他菜单项对应的代码...
       }
     },
-
   // ...其他方法...
   setUserRole() {
     // 从 localStorage 获取用户角色
@@ -234,7 +193,6 @@ export default {
 </script>
 
 <style scoped>
-
 
  .nav-button {
         display: flex;
@@ -271,10 +229,17 @@ export default {
   display: flex;
   justify-content: space-between; /* 平均分配主轴空间 */
   align-items: center;
-  background-color: #1878f5; /* 示例颜色 */
   padding: 2em;
   color: #fff;
   height: 108px;
+}
+
+.header-red {
+  background-color: red;
+}
+
+.header-blue {
+  background-color: rgb(122, 3, 158);
 }
 
 .user-info {
@@ -286,15 +251,6 @@ export default {
   margin-right: 20px; /* 与退出按钮之间的距离 */
 }
 
-.logout-button {
-  padding: 5px 15px;
-  color: #fff;
-  background-color: #070420; /* 按钮背景颜色 */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  outline: none;
-}
 
 .logout-button:hover {
   background-color: #004d40;
@@ -386,10 +342,6 @@ button[type="submit"]:hover {
 .user-info {
   display: flex;
   align-items: center;
-}
-
-.username {
-  margin-right: 20px; /* 与退出按钮之间的距离 */
 }
 
 .logout-button {

@@ -1,22 +1,24 @@
 <template>
-    <div>
-      <table v-if="users && users.length" class="user-table">
-        <thead>
-          <tr>
-            <th>角色</th>
-            <th>用户名</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.username">
-            <td>{{ user.role }}</td>
-            <td>{{ user.username }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p v-else>无用户显示。</p>
-    </div>
-  </template>
+  <div>
+    <table v-if="users && users.length" class="user-table">
+      <thead>
+        <tr>
+          <th>角色</th>
+          <th>用户名</th>
+          <th>教师ID</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="user in users" :key="user.username">
+          <td>{{ user.role }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.teacher_id }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p v-else>无用户显示。</p>
+  </div>
+</template>
   
  
    <!-- <template>

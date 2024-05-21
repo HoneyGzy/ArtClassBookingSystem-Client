@@ -1,6 +1,6 @@
 <template>
   <div class="booking-management">
-    <el-table :data="bookings" style="width: 100%" :row-class-name="tableRowClassName" empty-text="暂无待审核预约">
+    <el-table :data="bookings" style="width: 100%" :row-class-name="tableRowClassName" empty-text="暂无已成功预约">
       <el-table-column prop="username" label="预约用户"></el-table-column>
       <el-table-column prop="courseId" label="课程ID"></el-table-column>
       <el-table-column prop="courseTitle" label="课程名称"></el-table-column>
@@ -48,7 +48,7 @@
 import axios from 'axios';
 
 export default {
-  name:'BookingCotentManageComponent',
+  name:'AlreadyBookingCotentManageComponent',
   data() {
     return {
       bookings: [], // 这里需要加载你的预约课程数据
@@ -70,7 +70,7 @@ export default {
   },
   methods: {  
     fetchCourses() {
-        axios.get('http://localhost:3000/api/getAllcourseregistration') // 确保使用正确的HTTP端点
+        axios.get('http://localhost:3000/api/getAllAlreadycourseregistration') // 确保使用正确的HTTP端点
         .then(response => {
             this.bookings = response.data;
         })

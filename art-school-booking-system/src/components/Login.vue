@@ -134,7 +134,7 @@ export default {
           this.$router.push('/adminDashboard');
         } else if (response.data.teacherFlag) {
           // 否则跳转到普通用户页面
-          this.$router.push('/dashboard');
+          this.$router.push('/TeacherDashBoard');
         }else{
           this.$router.push('/StudentDashboard');
         }

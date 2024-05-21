@@ -4,6 +4,7 @@ import DashboardComponent from '@/components/DashBoard.vue'; // 确保这个路�
 import MainContentComponent  from '../components/MainContentForVisit.vue';
 import AdminDashBoard from '@/components/AdminDashBoard.vue';
 import StudentDashBoard from '@/components/StudentContent.vue';
+import TeacherDashBoard from '@/components/TeacherDashBoard.vue';
 
 // 路由定义...
 const routes = [
@@ -33,6 +34,11 @@ const routes = [
     path: '/adminDashboard',
     name: 'AdminDashboard',
     component: AdminDashBoard
+  },
+  {
+    path: '/TeacherDashBoard',
+    name: 'TeacherDashBoard',
+    component: TeacherDashBoard
   },
 ];
 

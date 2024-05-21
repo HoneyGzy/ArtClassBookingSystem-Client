@@ -1,37 +1,41 @@
 <template>
-    <div class="form-container">
-      <h2>添加用户</h2>
-  
-      <form @submit.prevent="handleSubmit" class="form-fields">
-        <div class="field">
-          <label for="username">用户名</label>
-          <input id="username" v-model="username" placeholder="输入用户名" required>
-        </div>
+  <div class="form-container">
+    <h2>添加用户</h2>
 
-        <div class="field">
-            <label for="password">密码</label>
-            <input id="password" type="password" v-model="password" placeholder="输入密码" required>
-         </div>
+    <el-form @submit.prevent="handleSubmit" class="form-fields">
 
-         <div class="field">
-            <label for="password">再次输入密码</label>
-            <input id="password" type="password" v-model="confirmPassword" placeholder="再次输入密码" required>
-         </div>
-  
-        <div class="field">
-          <label for="role">角色</label>
-          <select id="role" v-model="role" required>
-            <option disabled value="">选择角色</option>
-            <option value="student">学生</option>
-            <option value="teacher">教师</option>
-            <option value="admin">管理员</option>
-          </select>
-        </div>
-  
-        <button type="submit">提交</button>
-      </form>
-    </div>
-  </template>
+      <el-form-item label="角色">
+        <el-select v-model="role" placeholder="选择角色">
+          <el-option disabled value="">选择角色</el-option>
+          <el-option label="学生" value="student"></el-option>
+          <el-option label="教师" value="teacher"></el-option>
+          <el-option label="管理员" value="admin"></el-option>
+        </el-select>
+      </el-form-item>
+
+      <el-form-item label="用户名">
+        <el-input v-model="username" placeholder="输入用户名"></el-input>
+      </el-form-item>
+
+      <el-form-item label="密码">
+        <el-input type="password" v-model="password" placeholder="输入密码"></el-input>
+      </el-form-item>
+
+      <el-form-item label="再次输入密码">
+        <el-input type="password" v-model="confirmPassword" placeholder="再次输入密码"></el-input>
+      </el-form-item>
+
+      <el-form-item v-if="role == 'teacher'" label="教师ID">
+        <el-input v-model="teacherId" placeholder="输入教师ID"></el-input>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" native-type="submit">提交</el-button>
+      </el-form-item>
+      
+    </el-form>
+  </div>
+</template>
   
   <script>
 import axios from 'axios'; // 引入axios
@@ -43,7 +47,8 @@ export default {
         username: '',
         role: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        teacherId: '',    // 新的数据项：teacherId  
       };
     },
     
@@ -84,7 +89,8 @@ export default {
             username: this.username,
             password: this.password,
             role: this.role,
-            confirmPassword: this.confirmPassword
+            confirmPassword: this.confirmPassword,
+            teacherId: this.teacherId     // 传递 teacherId
         })
         .then(response => {
 

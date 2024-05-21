@@ -380,6 +380,7 @@ export default {
       this.handlePagination();
     },
     openReserveDialog(course) {
+      console.log(course)
       this.selectedCourse = course;
       this.isReserveDialogVisible = true;
     },
@@ -455,7 +456,7 @@ export default {
       try {
         // 提取出用户名和课程ID
         const users = this.useusername;
-        const courseId = this.selectedCourse.id;
+        const courseId = this.selectedCourse.course_id;
         const courseTitle = this.selectedCourse.title;
 
         // 发送预约请求

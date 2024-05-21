@@ -11,8 +11,9 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="教师姓名" prop="teacher">
-            <el-input v-model="formCourse.teacher"></el-input>
+          <!-- 新增的课程ID输入组件 -->
+          <el-form-item label="课程ID" prop="course_id">
+            <el-input v-model="formCourse.course_id"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
@@ -39,10 +40,19 @@
         </el-upload>
       </el-form-item>
 
-      <!-- 新增的课程ID输入组件 -->
-      <el-form-item label="课程ID" prop="course_id">
-        <el-input v-model="formCourse.course_id"></el-input>
-      </el-form-item>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="教师姓名" prop="teacher">
+            <el-input v-model="formCourse.teacher"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+              <!-- 新增的教师ID输入组件 -->
+          <el-form-item label="教师ID" prop="course_id">
+            <el-input v-model="formCourse.teacher_id"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
       
       <el-row :gutter="20">
         <el-col :span="8">
@@ -118,7 +128,9 @@ export default {
         course_id: '',
         courseCategory: '',
         difficultyLevel: '',
-        recommendedAge:''
+        recommendedAge:'',
+        teacher_id:''
+
       },
       fileList: [],
       
@@ -154,12 +166,9 @@ export default {
   
 
     saveCourse() {
-
       // 先上传图片
       this.$refs.uploader.submit();
-
-
-      axios.post('http://localhost:3000/courses', this.formCourse)
+      axios.post('http://localhost:3000/api/create_courses', this.formCourse)
       .then(response => {
         console.log(response);
         this.courses.push(this.formCourse);
