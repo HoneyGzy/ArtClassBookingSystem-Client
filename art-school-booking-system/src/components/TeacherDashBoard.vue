@@ -32,7 +32,7 @@
 
         <el-menu-item index="6" @click="handleNavSelection('6')">
           <el-icon><calendar /></el-icon>
-          <span>预约管理</span>
+          <span>我的预约</span>
         </el-menu-item>
 
         <el-menu-item index="9"  @click="handleNavSelection('9')">
@@ -63,7 +63,7 @@ import UserCenterComponent from './UserCenter.vue'
 import CourseRegistration from './CourseRegistration.vue'
 import CourseListComponent from './CourseListContent.vue'
 import CourseManagerComponent from './CourseManagerContent.vue'
-import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
+import TeacherBookingCotentManageComponent from './TeacherBookingCotentManageComponent.vue'
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
 export default {
@@ -80,7 +80,7 @@ export default {
     CourseRegistration,
     CourseListComponent,
     CourseManagerComponent,
-    BookingCotentManageComponent,
+    TeacherBookingCotentManageComponent,
 
     ElContainer,
     ElHeader,
@@ -148,14 +148,9 @@ export default {
         case '5':
           this.selectedCategoryComponent = 'searchComponent';
           break;
-        case '6':
-          if (this.userRole === 'teacher') {
-            this.selectedCategoryComponent = 'BookingCotentManageComponent';
-            break;
-          } else {
-            this.selectedCategoryComponent = 'CourseBookingCotent';
-            break;    
-          }
+        case '6': 
+          this.selectedCategoryComponent = 'TeacherBookingCotentManageComponent';
+          break;
         case '7':
           this.selectedCategoryComponent = 'CourseRegistration';
           break;    
