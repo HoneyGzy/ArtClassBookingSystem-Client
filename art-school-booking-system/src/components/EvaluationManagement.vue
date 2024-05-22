@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'EvaluationManagement',
   data() {
@@ -33,14 +35,22 @@ export default {
         target: '',
         content: '',
       },
-      targets: [
-        //你可以修改这些选项以匹配你的课程或教师名单
-        {value: 'option1', label: '课程1'},
-        {value: 'option2', label: '课程2'},
-        {value: 'option3', label: '教师1'},
-        {value: 'option4', label: '教师2'},
-      ],
+      targets: [],
     };
+  },
+  created()
+  {
+    this.username = localStorage.getItem('userName');
+
+  },
+  async mounted() {
+    try { 
+      let username = this.username
+      const res = await axios.get(`http://localhost:3000/api/course_completion?username=${username}`);
+        this.targets = res.data.map(item => ({value: item.title, label: item.teacher}));
+    } catch(err) {
+      console.error(err);
+    }
   },
   methods: {
     submitForm(formName) {

@@ -121,8 +121,10 @@ export default {
   data() {
     return {
       activeTab: "profile",
+      isProfileCompleted: false,
       user: {
         name: "",
+        username: "",
         email: "",
         phone: "",
         registerTime: "",
@@ -149,6 +151,7 @@ export default {
         // 可以添加其他字段的验证规则
       },
       resizeObserver: null, // 存储resizeObserver实例
+      completedCourses :[]
     };
   },
   
@@ -172,6 +175,7 @@ export default {
 
   created() {
       this.username = localStorage.getItem('userName');
+      this.checkProfileCompletion(this.username);
       console.log(this.username)
   },
 
@@ -190,26 +194,49 @@ export default {
     },
     getCourseStatus(course) {
       console.log(course)
+
       // 解析课程日期
       const courseDate = new Date(course.date);
+      
       // 获取当前日期
       const now = new Date();
+      
       // 如果课程状态为预约成功
       if (course.reservationStatus === '预约成功') {
+        
         // 检查课程日期是否在当前日期之后
         if (courseDate > now) {
-          // 如果课程还没有开始，返回30%的进度和预约成功未开课的标签
+        // 如果课程还没有开始，返回30%的进度和预约成功未开课的标签
           return {
             progress: 30,
             tag: '预约成功，未开课'
           };
         } else {
+          // 检查课程是否已经提交
+          if(this.completedCourses.includes(course.id)) {
+            return {
+              progress: 100,
+              tag: '课程已完成'
+            };
+          }
           // 如果课程已经开始，返回100%的进度和课程已完成的标签
+          try {
+          
+            const response =  axios.post('http://localhost:3000/api/course_completion', course);
+            console.log(response);
+            console.log("Successfully submitted user profile.");
+            // 保存已提交的课程
+            this.completedCourses.push(course.id);
+          } catch (error) {
+            console.error("Error submitting user profile:", error);
+          } 
+
           return {
             progress: 100,
             tag: '课程已完成'
           };
         }
+      
       } else {
         // 如果预约未成功，返回0%的进度和预约未成功的标签
         return {
@@ -218,11 +245,24 @@ export default {
         };
       }
     },
+    async checkProfileCompletion(username) {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/user/profile?username=${username}`);
+        const userProfile = response.data;
+        if (userProfile) {
+          this.isProfileCompleted = true;
+          this.user = userProfile;
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    },
     handleTabClick(tab) {
       console.log(tab);
       console.log(tab.props.name)
       switch(tab.props.name) {
         case 'profile':
+          this.checkProfileCompletion(this.username);
           // 执行个人信息页签被点击时的逻辑
           break;
         case 'courses':
@@ -246,17 +286,26 @@ export default {
           break;
         }
     },
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+    async submitForm(formName) {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          // 提交表单
-          console.log("submit!");
+          try {
+            this.user.username = this.username;
+            const response = await axios.post('http://localhost:3000/api/user/profile', this.user);
+            console.log(response)
+            this.isProfileCompleted = true;
+            console.log("Successfully submitted user profile.");
+          } catch (error) {
+            console.error("Error submitting user profile:", error);
+          }
         } else {
-          console.log("error submit!!");
+          console.log("Error submit!!");
           return false;
         }
       });
     },
+   
+   
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
