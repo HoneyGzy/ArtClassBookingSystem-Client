@@ -151,7 +151,6 @@ export default {
         // 可以添加其他字段的验证规则
       },
       resizeObserver: null, // 存储resizeObserver实例
-      completedCourses :[]
     };
   },
   
@@ -212,21 +211,13 @@ export default {
             tag: '预约成功，未开课'
           };
         } else {
-          // 检查课程是否已经提交
-          if(this.completedCourses.includes(course.id)) {
-            return {
-              progress: 100,
-              tag: '课程已完成'
-            };
-          }
+  
           // 如果课程已经开始，返回100%的进度和课程已完成的标签
           try {
           
             const response =  axios.post('http://localhost:3000/api/course_completion', course);
             console.log(response);
             console.log("Successfully submitted user profile.");
-            // 保存已提交的课程
-            this.completedCourses.push(course.id);
           } catch (error) {
             console.error("Error submitting user profile:", error);
           } 
