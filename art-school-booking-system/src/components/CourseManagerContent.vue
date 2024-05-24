@@ -1,60 +1,144 @@
 <template>
-    <div class="course-list">
-      <el-row :gutter="20">
-        <CourseCard
-            v-for="course in pagedCourses"
-            :key="course.id"
-            :searchResults="[course]"
-        >
-          <template #extra>
-            <el-button type="primary" @click="editCourse(course)">编辑课程</el-button>
-            <el-button type="primary" @click="deleteCourse(course)">删除课程</el-button>
-          </template>
-        </CourseCard>
-      </el-row>
-      <!-- Modal window for course editing -->
-      <div class="modal" v-if="showModal">
-        <h2>编辑课程</h2>
-        <form @submit.prevent="updateCourse">
-          <label>课程名称: 
-            <input type="text" v-model="selectedCourse.title">
-          </label>
-          <label>课程描述: 
-            <input type="text" v-model="selectedCourse.description">
-          </label>
-          <label>课程老师: 
-            <input type="text" v-model="selectedCourse.teacher">
-          </label>
-          <label>课程日期: 
-            <input type="datetime-local" v-model="selectedCourse.date">
-          </label>
-          <label>课程价格: 
-            <input type="text" v-model="selectedCourse.price">
-          </label>
-          <!-- Add form fields for other course properties... -->
-          <button type="submit">保存</button>
-        </form>
-        <button @click="closeModal">关闭窗口</button>
-      </div> 
-    </div>
+  <div class="course-list">
+    <el-row :gutter="20">
+      <CourseCard
+        v-for="course in pagedCourses"
+        :key="course.id"
+        :searchResults="[course]"
+      >
+        <template #extra>
+          <el-button type="primary" @click="editCourse(course)">编辑课程</el-button>
+          <el-button type="primary" @click="deleteCourse(course)">删除课程</el-button>
+        </template>
+      </CourseCard>
+    </el-row>
+    
+    <!-- Modal window for course editing -->
+    <el-dialog title="编辑课程" v-model="showModal">
+      <el-form ref="formCourse" :model="selectedCourse" :rules="rules" label-position="top" @submit.prevent="updateCourse">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="课程标题" prop="title">
+              <el-input v-model="selectedCourse.title"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="课程ID" prop="course_id">
+              <el-input v-model="selectedCourse.course_id"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <el-form-item label="课程描述" prop="description">
+          <el-input type="textarea" v-model="selectedCourse.description"></el-input>
+        </el-form-item>
+
+        <el-form-item label="课程照片">
+          <el-upload
+            class="upload-demo"
+            ref="uploader"  
+            action="http://localhost:3000/upload"
+            accept=".png, .jpeg, .jpg"
+            :limit="1"
+            :on-exceed="handleExceed"
+            :before-upload="beforeUpload"
+            :file-list="fileList"
+            :data="getUploadData"
+            :auto-upload="false"  
+          >
+            <el-button size="small">选取文件</el-button>
+          </el-upload>
+        </el-form-item>
+
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="教师姓名" prop="teacher">
+              <el-input v-model="selectedCourse.teacher"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="教师ID" prop="teacher_id">
+              <el-input v-model="selectedCourse.teacher_id"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="课程时长(分钟)" prop="duration">
+              <el-input-number v-model="selectedCourse.duration" controls-position="right" :min="1"></el-input-number>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="开课时间" prop="date">
+              <el-input type="datetime-local" v-model="selectedCourse.date"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="课程价格(元)" prop="price">
+              <el-input-number v-model="selectedCourse.price" controls-position="right" :min="0"></el-input-number>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="20">
+          <el-col :span="8">
+            <el-form-item label="课程分类" prop="courseCategory">
+              <el-select v-model="selectedCourse.courseCategory" placeholder="请选择">
+                <el-option
+                  v-for="item in ['音乐', '舞蹈', '绘画', '书法', '设计', '雕塑', '摄影', '乐器']"
+                  :key="item"
+                  :label="item"
+                  :value="item">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="8">
+            <el-form-item label="难度评级" prop="difficultyLevel">
+              <el-select v-model="selectedCourse.difficultyLevel" placeholder="请选择">
+                <el-option
+                  v-for="level in ['初级', '中级', '高级']"
+                  :key="level"
+                  :label="level"
+                  :value="level">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="8">
+            <el-form-item label="推荐年龄" prop="recommendedAge">
+              <el-input v-model="selectedCourse.recommendedAge" placeholder="请输入"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        
+        <el-button type="primary" native-type="submit">保存</el-button>
+        <el-button @click="closeModal">关闭窗口</el-button>
+      </el-form>
+    </el-dialog>
+
     <transition name="fade">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-size="pageSize"
-          layout="total, prev, pager, next, jumper"
-          :total="courses.length">
-      </el-pagination>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        layout="total, prev, pager, next, jumper"
+        :total="courses.length"
+      ></el-pagination>
     </transition>
+  </div>
 </template>
 
 <script>
-import CourseCard from './CourseCard.vue'
+import CourseCard from './CourseCard.vue';
 import axios from 'axios';
 
 export default {
-  name:'CourseManagerComponent',
+  name: 'CourseManagerComponent',
   components: {
     CourseCard,
   },
@@ -62,25 +146,42 @@ export default {
     return {
       courses: [],
       showModal: false,
-      selectedCourse: null,
-      pagedCourses:null,
+      selectedCourse: {},
+      pagedCourses: [],
       pageSize: 12,
-      currentPage: 1
-    }
+      currentPage: 1,
+      fileList: [],
+    };
   },
   created() {
     this.fetchCourses();
+  },
+  watch: {
+    courses() {
+      this.handlePagination();
+    },
+    currentPage() {
+      this.handlePagination();
+    },
+    pageSize() {
+      this.handlePagination();
+    }
   },
   methods: {
     fetchCourses() {
       axios.get('http://localhost:3000/api/courses')
         .then(response => {
-          this.courses = response.data;
-          this.handlePagination(); // 处理分页
+          if (Array.isArray(response.data)) {
+            this.courses = response.data;
+          } else {
+            console.error('Invalid API response');
+            this.$message.error("无效的API响应");
+          }
         })
         .catch(error => {
           console.error(error);
-        })
+          this.$message.error("获取课程列表失败");
+        });
     },
     handlePagination() {
       const start = (this.currentPage - 1) * this.pageSize;
@@ -89,6 +190,7 @@ export default {
     },
     handleSizeChange(val) {
       this.pageSize = val;
+      this.currentPage = 1;
       this.handlePagination();
     },
     handleCurrentChange(val) {
@@ -96,125 +198,61 @@ export default {
       this.handlePagination();
     },
     editCourse(course) {
+      this.selectedCourse = course ? { ...course } : {}; // 确保 course 不为空
       this.showModal = true;
-      this.selectedCourse = Object.assign({}, course);  // 避免直接修改课程列表数据
     },
     closeModal() {
       this.showModal = false;
+      // this.selectedCourse = null; // 关闭窗口后重置表单
+      this.fileList = []; // 重置文件列表
     },
     updateCourse() {
       axios.put(`http://localhost:3000/api/courses/${this.selectedCourse.id}`, this.selectedCourse)
-        .then(response => {
-          console.log(response)  
-          let index = this.courses.findIndex(course => course.id === this.selectedCourse.id);
+        .then(() => {
+          const index = this.courses.findIndex(course => course.id === this.selectedCourse.id);
+          console.log(index)
           if (index !== -1) {
-            this.courses.splice(index, 1, this.selectedCourse);
+            this.courses[index] = this.selectedCourse; // 在 Vue 3 中，直接这样更新是响应式的
+            this.handlePagination(); // 重新计算分页以反映更新
           }
+          this.$message.success('课程更新成功');
           this.closeModal();
         })
         .catch(error => {
           console.error(error);
+          this.$message.error('课程更新失败');
         });
     },
     deleteCourse(course) {
-      console.log(course)  
       axios.delete(`http://localhost:3000/api/courses/${course.id}`)
-        .then(response => {
-          console.log(response)  
-          this.$message.success('刪除成功！');
-          this.fetchCourses();
-          // this.courses.splice(course, 1);
+        .then(() => {
+          const index = this.courses.findIndex(c => c.id === course.id);
+          if (index !== -1) {
+            this.courses.splice(index, 1);
+          }
+          this.$message.success('删除成功');
         })
         .catch(error => {
           console.error(error);
+          this.$message.error('删除失败');
         });
-    }
+    },
+    handleExceed() {
+      this.$message.warning('文件数量超出限制');
+    },
+    beforeUpload(file) {
+      this.fileList = [file];
+      return false; // 不自动上传
+    },
+    getUploadData() {
+      return { courseId: this.selectedCourse.course_id };
+    },
   }
-}
+};
 </script>
 
 <style scoped>
-.course-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-gap: 10px;
-}
-.course-item {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-}
-/* .modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 80%;
-  max-width: 500px;
-  padding: 20px;
-  border-radius: 5px;
-  background: white;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-} */
-
-
-
-
 .modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 90%;
-  max-width: 800px;
-  padding: 40px;
-  border-radius: 10px;
-  background: white;
-  transition: all 0.3s ease-out;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  font-size: 18px;
+  /* Add your modal styles */
 }
-
-.modal h2 {
-  font-size: 32px;
-}
-
-.modal form {
-  margin-top: 20px;
-}
-
-.modal label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.modal input {
-  height: 40px;
-  width: 100%;
-  padding: 0 10px;
-  font-size: 18px;
-}
-
-.modal button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.3s;
-}
-
-.modal button:hover {
-  background: #0056b3;
-}
-
-.modal button:disabled {
-  background: #ccc;
-  cursor: default;
-}
-
-
 </style>

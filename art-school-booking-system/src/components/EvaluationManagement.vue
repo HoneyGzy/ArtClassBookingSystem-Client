@@ -83,7 +83,6 @@ export default {
 };
 </script> -->
 
-
 <template>
   <div>
     <h1>评价管理</h1>
@@ -125,6 +124,8 @@ export default {
       form: {
         target: '',
         content: '',
+        username: '', // add username to the form
+        course_name: '', // add course_name to the form
       },
       targets: [],
       originalData: [], // 保存原始数据
@@ -132,11 +133,11 @@ export default {
     };
   },
   created() {
-    this.username = localStorage.getItem('userName');
+    this.form.username = localStorage.getItem('userName'); // 获取用户名并赋值给 form
   },
   async mounted() {
     try {
-      const username = this.username;
+      const username = this.form.username;
       const res = await axios.get(`http://localhost:3000/api/course_completion?username=${username}`);
       this.originalData = res.data;
       this.updateTargets(); // 根据初始 displayMode 设置 targets
@@ -156,7 +157,7 @@ export default {
             this.$message.success('提交成功！');
           } catch (err) {
             console.error(err);
-            this.$message.error('提交失败，请稍后重试！');
+            this.$message.error('您已经提交过对该课程或该老师的评论了！');
           }
         } else {
           console.log('error submit!!');
@@ -168,18 +169,24 @@ export default {
       this.$refs[formName].resetFields();
     },
     handleSelectChange(selectedValue) {
+      this.form.course_name = this.extractCourseName(selectedValue); // 更新选中的 course_name
       console.log(selectedValue);
+    },
+    extractCourseName(target) {
+      // 提取课程名的逻辑，根据你保存数据的方式修改
+      // 例如，如果 target 是“CourseName (TeacherName)”格式，你可以用下面的代码提取课程名：
+      return target.split(' (')[0];
     },
     updateTargets() {
       // 根据 displayMode 更新 targets 内容
       if (this.displayMode === '显示课程') {
         this.targets = this.originalData.map(item => ({
-          value: item.title,
-          label: item.title,
+          value: item.title + ' (' + item.teacher + ')',
+          label: item.title + ' (' + item.teacher + ')',
         }));
       } else {
         this.targets = this.originalData.map(item => ({
-          value: item.teacher,
+          value: item.title + ' (' + item.teacher + ')',
           label: item.teacher,
         }));
       }
