@@ -18,15 +18,6 @@
       <!-- 标题展示 -->
       <div class="title-image"></div>
 
-      <!-- <el-row :gutter="20" class="content-display">
-          <el-col :span="6" v-for="(card, i) in cards" :key="i">
-              <el-card>
-                  <img :src="card.logo">
-                  <p>{{ card.content }}</p>
-              </el-card>
-          </el-col>
-      </el-row> -->
-
       <!-- 近期热门课程推荐 -->
       <div class="hot-course-section">
         <div class="wrapper">
@@ -45,6 +36,17 @@
           </el-carousel>
         </div>
       </div>
+       <!-- 课程模态框 -->
+      <el-dialog
+        v-model="isCourseDialogVisible"
+        width="50%"
+        :before-close="handleCourseDialogClose">
+        <div>
+        </div>
+        <template #footer>
+          <el-button @click="isCourseDialogVisible = false">关闭</el-button>
+        </template>
+      </el-dialog>
 
       <!-- 艺术课程分类 -->
       <div class="course-category-section">
@@ -269,8 +271,10 @@ export default {
     
       categories: ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'],
       dialogVisible: false,
+      isCourseDialogVisible: false,
       clickedCardIndex: null,
       categoryData: [],
+      HotCourseInfo:[],
 
 
       username: null,
@@ -344,6 +348,21 @@ export default {
   },
   
   methods: {
+    handleImageClick(subItem) {
+      this.HotCourseInfo = subItem;
+      this.isCourseDialogVisible = true;
+      try {
+        const response =  axios.get(`http://localhost:3000/api/courses/${subItem.course_id}`);
+        this.HotCourseInfo = response.data; // 假设返回的数据中即包含课程信息
+      } catch (error) {
+        console.error('获取课程信息失败', error);
+        this.isCourseDialogVisible = false;
+      }
+    },
+    handleCourseDialogClose() {
+      this.isCourseDialogVisible = false;
+      this.HotCourseInfo = {};
+    },
     handleCardClick(idx) {
       this.clickedCardIndex = idx
       this.dialogVisible = true

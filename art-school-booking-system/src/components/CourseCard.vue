@@ -69,7 +69,8 @@ export default {
 props: {
   searchResults: {
     type: Array,
-    required: true
+    required: true,
+    default: () => []
     }
 },
 created() {

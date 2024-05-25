@@ -9,6 +9,7 @@
         <template #extra>
           <el-button type="primary" @click="editCourse(course)">编辑课程</el-button>
           <el-button type="primary" @click="deleteCourse(course)">删除课程</el-button>
+          <el-button type="primary" @click="updateOrUploadImage(course)">更新/上传图片</el-button>
         </template>
       </CourseCard>
     </el-row>
@@ -31,23 +32,6 @@
         
         <el-form-item label="课程描述" prop="description">
           <el-input type="textarea" v-model="selectedCourse.description"></el-input>
-        </el-form-item>
-
-        <el-form-item label="课程照片">
-          <el-upload
-            class="upload-demo"
-            ref="uploader"  
-            action="http://localhost:3000/upload"
-            accept=".png, .jpeg, .jpg"
-            :limit="1"
-            :on-exceed="handleExceed"
-            :before-upload="beforeUpload"
-            :file-list="fileList"
-            :data="getUploadData"
-            :auto-upload="false"  
-          >
-            <el-button size="small">选取文件</el-button>
-          </el-upload>
         </el-form-item>
 
         <el-row :gutter="20">
@@ -120,6 +104,46 @@
       </el-form>
     </el-dialog>
 
+    <el-dialog title="更新/上传课程图片" v-model="showUploadModal">
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item label="课程标题" prop="title">
+            <el-input v-model="selectedCourse.title" readonly></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="课程ID" prop="course_id">
+            <el-input v-model="selectedCourse.course_id" readonly></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      
+      <el-form-item label="课程描述" prop="description">
+        <el-input type="textarea" v-model="selectedCourse.description" readonly></el-input>
+      </el-form-item>
+
+      <el-form-item label="课程照片">
+        <el-upload
+          class="upload-demo"
+          ref="uploader"  
+          action="http://localhost:3000/upload"
+          accept=".png, .jpeg, .jpg"
+          :limit="1"
+          :on-exceed="handleExceed"
+          :before-upload="beforeUpload"
+          :file-list="fileList"
+          :data="getUploadData"
+          :auto-upload="false"
+          :on-success="handleUploadSuccess"
+          :on-error="handleUploadError"
+        >
+          <el-button size="small">选取文件</el-button>
+        </el-upload>
+      </el-form-item>
+      <el-button type="primary" @click="submitUpload">上传</el-button>
+      <el-button @click="closeUploadModal">关闭窗口</el-button>
+    </el-dialog>
+
     <transition name="fade">
       <el-pagination
         @size-change="handleSizeChange"
@@ -146,6 +170,7 @@ export default {
     return {
       courses: [],
       showModal: false,
+      showUploadModal: false,
       selectedCourse: {},
       pagedCourses: [],
       pageSize: 12,
@@ -208,13 +233,13 @@ export default {
     },
     updateCourse() {
       axios.put(`http://localhost:3000/api/courses/${this.selectedCourse.id}`, this.selectedCourse)
-        .then(() => {
-          const index = this.courses.findIndex(course => course.id === this.selectedCourse.id);
-          console.log(index)
-          if (index !== -1) {
-            this.courses[index] = this.selectedCourse; // 在 Vue 3 中，直接这样更新是响应式的
-            this.handlePagination(); // 重新计算分页以反映更新
-          }
+      .then(() => {
+        const index = this.courses.findIndex(course => course.id === this.selectedCourse.id);
+        console.log(index)
+        if (index !== -1) {
+          this.courses[index] = this.selectedCourse; // 在 Vue 3 中，直接这样更新是响应式的
+          this.handlePagination(); // 重新计算分页以反映更新
+        }
           this.$message.success('课程更新成功');
           this.closeModal();
         })
@@ -224,28 +249,54 @@ export default {
         });
     },
     deleteCourse(course) {
-      axios.delete(`http://localhost:3000/api/courses/${course.id}`)
-        .then(() => {
+      axios.delete(`http://localhost:3000/api/courses/${course.id}`, {
+          data: {
+              course_id: course.course_id
+          }
+      })
+      .then(() => {
           const index = this.courses.findIndex(c => c.id === course.id);
           if (index !== -1) {
-            this.courses.splice(index, 1);
+              this.courses.splice(index, 1);
           }
           this.$message.success('删除成功');
-        })
-        .catch(error => {
+          this.handlePagination();
+      })
+      .catch(error => {
           console.error(error);
           this.$message.error('删除失败');
-        });
+      });
     },
     handleExceed() {
       this.$message.warning('文件数量超出限制');
     },
     beforeUpload(file) {
       this.fileList = [file];
-      return false; // 不自动上传
+      return true; // 确保返回true以触发上传
     },
     getUploadData() {
-      return { courseId: this.selectedCourse.course_id };
+      return { course_id: this.selectedCourse.course_id };
+    },
+    updateOrUploadImage(course) {
+      this.selectedCourse = course;
+      this.showUploadModal = true;
+    },
+    submitUpload() {
+
+      console.log(111111)
+      this.$refs.uploader.submit();
+    },
+    handleUploadSuccess() {
+      this.$message.success('图片上传成功');
+      
+    },
+    handleUploadError() {
+      this.$message.error('图片上传失败');
+      
+    },
+    closeUploadModal() {
+      this.showUploadModal = false;
+      this.fileList = []; // 重置文件列表
     },
   }
 };
