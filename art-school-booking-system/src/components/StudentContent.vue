@@ -39,12 +39,16 @@
        <!-- 课程模态框 -->
       <el-dialog
         v-model="isCourseDialogVisible"
-        width="50%"
+        width="30%"
         :before-close="handleCourseDialogClose">
-        <div>
-        </div>
+        <!-- 把searchResults作为Prop传递给CourseCard组件 -->
+          <CourseSingleCard :course="HotCourseInfo" >
+            <template #extra>
+              <el-button type="primary" @click="openReserveDialog(HotCourseInfo)">预约课程</el-button>
+            </template>
+          </CourseSingleCard>
         <template #footer>
-          <el-button @click="isCourseDialogVisible = false">关闭</el-button>
+        <el-button @click="isCourseDialogVisible = false">关闭</el-button>
         </template>
       </el-dialog>
 
@@ -252,6 +256,8 @@
 
 import axios from 'axios';
 import CourseCard from './CourseCard.vue';
+import CourseSingleCard from './CourseCardSingle.vue';
+
 import CourseRegistration from './CourseRegistration.vue';
 import EvaluationManagement from './EvaluationManagement.vue';
 import UsercenterCoponent from'./UserCenter.vue';
@@ -261,6 +267,7 @@ import SearchComponent from './SearchContent.vue'
 export default {
   components: {
     CourseCard,
+    CourseSingleCard,
     CourseRegistration,
     EvaluationManagement,
     UsercenterCoponent,
@@ -268,15 +275,11 @@ export default {
   },
   data() {
     return {
-    
-      categories: ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'],
       dialogVisible: false,
       isCourseDialogVisible: false,
       clickedCardIndex: null,
       categoryData: [],
-      HotCourseInfo:[],
-
-
+      HotCourseInfo:{},
       username: null,
       form: {
         name: '',
@@ -292,6 +295,7 @@ export default {
         { logo: require('@/assets/icon/icons8-comments-100.png'), content: '评价中心' },
         { logo: require('@/assets/icon/icons8-user-100.png'), content: '用户中心' },
       ],
+      categories: ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'],
       course_categories: [
         {image: require('@/assets/icon/icons8-music-100.png'),alt: '音乐',description: '音乐' },
         {image: require('@/assets/icon/icons8-ballet-dancer-100.png'),alt: '舞蹈',description: '舞蹈' },
@@ -322,8 +326,7 @@ export default {
 
       fastentrydialogVisible: false, // 控制模态框的显示和隐藏
       dialogContent: '', // 模态框中显示的内容
-      currentIndex: null
-
+      currentIndex: null,
     };
   },
   created() {
@@ -348,12 +351,14 @@ export default {
   },
   
   methods: {
-    handleImageClick(subItem) {
+    async handleImageClick(subItem) {
       this.HotCourseInfo = subItem;
       this.isCourseDialogVisible = true;
       try {
-        const response =  axios.get(`http://localhost:3000/api/courses/${subItem.course_id}`);
+        // 等待axios请求完成
+        const response = await axios.get(`http://localhost:3000/api/courses/${subItem.course_id}`);
         this.HotCourseInfo = response.data; // 假设返回的数据中即包含课程信息
+        console.log(response.data);
       } catch (error) {
         console.error('获取课程信息失败', error);
         this.isCourseDialogVisible = false;
@@ -635,11 +640,11 @@ export default {
   transform: scale(1.05);
 }
 
-.carousel-item-img {
-  height: 55%; /* 根据你的需求调整这个值 */
+/* .carousel-item-img {
+  height: 55%; 
   width: auto;
   object-fit: cover;
-}
+} */
 
 .el-carousel, .el-carousel-item {
   height: auto; /* 或者一个具体的值，比如 '300px' */
@@ -647,13 +652,27 @@ export default {
 
 .carousel-item-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
 }
+
+/* .carousel-item {
+  width: 33.33%;
+} */
 
 .carousel-item {
-  width: 33.33%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.carousel-item-img {
+  width: 97%;
+  height: auto;
+  object-fit: cover; /* 保持图像等比例缩放并裁剪 */
+}
 .carousel-item:nth-child(3n) {
   margin-right: 0;  /* 每行的第三张图片不添加右边距 */
 }

@@ -57,6 +57,17 @@
             <el-menu-item index="4-2"  @click="handleNavSelection('4-2')">已预约课程</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
+
+        <el-sub-menu index="5" class="custom-sub-menu">
+          <template #title>
+            <el-icon><book /></el-icon>
+            <span>通知管理</span>
+          </template>
+          <el-menu-item-group class="custom-sub-menu-title">
+            <el-menu-item index="5-1"  @click="handleNavSelection('5-1')">活动管理</el-menu-item>
+            <el-menu-item index="5-2"  @click="handleNavSelection('5-2')">公告管理</el-menu-item>
+          </el-menu-item-group>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     <el-main class="content-display">
@@ -87,6 +98,7 @@ import UserUpdateComponent from './UserUpdateContent.vue'
 import UserDeletComponent from './UserDeleteContent.vue'
 import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
 import AlreadyBookingCotentManageComponent from './AlreadyBookingCotentManageComponent.vue'
+import NewsContentComponent from  './NewsContent.vue'
 
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
@@ -110,6 +122,7 @@ export default {
     UserDeletComponent,
     BookingCotentManageComponent,
     AlreadyBookingCotentManageComponent,
+    NewsContentComponent,
 
     ElContainer,
     ElHeader,
@@ -190,9 +203,13 @@ export default {
         case '4-2':
           this.selectedCategoryComponent = 'AlreadyBookingCotentManageComponent';
           break;
-        case '5':
-          this.selectedCategoryComponent = 'searchComponent';
+        case '5-1':
+          this.selectedCategoryComponent = 'NewsContentComponent';
           break;
+        case '5-2':
+          this.selectedCategoryComponent = 'BookingCotentManageComponent';
+          break;
+        
         case '6':
           this.selectedCategoryComponent = 'BookingCotentManageComponent';
           break;    
