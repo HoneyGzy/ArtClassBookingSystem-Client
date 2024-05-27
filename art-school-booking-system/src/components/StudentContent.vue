@@ -331,6 +331,7 @@ export default {
   },
   created() {
     this.fetchCourses();
+    this.fetchNews();
     this.setUserName();
     // this.fetchMusicCourses();
     this.useusername = localStorage.getItem('userName');
@@ -469,6 +470,25 @@ export default {
         .catch(error => {
           console.error(error);
         })
+    },
+    fetchNews() {
+      axios.get('http://localhost:3000/api/news')
+        .then(response => {
+          this.latestNews = response.data.map(news => ({
+            ...news,
+            date: this.formatDate(news.date)
+          }));
+        })
+        .catch(error => {
+          console.error("获取资讯列表失败：", error);
+        });
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     },
     handleClick(index) {
       this.currentIndex = index; // 记录当前点击的index

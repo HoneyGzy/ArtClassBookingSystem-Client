@@ -1,6 +1,6 @@
 <template>
   <div class="news-management">
-    <el-table :data="newsList" style="width: 100%" empty-text="暂无资讯">
+    <el-table :data="formattedNewsList" style="width: 100%" empty-text="暂无资讯">
       <el-table-column prop="title" label="资讯标题"></el-table-column>
       <el-table-column prop="content" label="资讯内容"></el-table-column>
       <el-table-column prop="date" label="发布时间"></el-table-column>
@@ -75,7 +75,22 @@
     {
       this.updateNewsList();
     },
+    computed: {
+      formattedNewsList() {
+        return this.newsList.map(news => ({
+          ...news,
+          date: this.formatDate(news.date)
+        }));
+      }
+    },
     methods: {
+      formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      },
       handleAddNews() {
         // this.currentNews = {}; // 清空当前资讯
         this.dialogVisible = true; // 显示添加资讯的表单模态框
