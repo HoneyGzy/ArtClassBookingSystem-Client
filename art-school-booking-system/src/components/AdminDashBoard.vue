@@ -64,7 +64,7 @@
             <span>通知管理</span>
           </template>
           <el-menu-item-group class="custom-sub-menu-title">
-            <el-menu-item index="5-1"  @click="handleNavSelection('5-1')">活动管理</el-menu-item>
+            <el-menu-item index="5-1"  @click="handleNavSelection('5-1')">资讯管理</el-menu-item>
             <el-menu-item index="5-2"  @click="handleNavSelection('5-2')">公告管理</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
@@ -99,6 +99,7 @@ import UserDeletComponent from './UserDeleteContent.vue'
 import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
 import AlreadyBookingCotentManageComponent from './AlreadyBookingCotentManageComponent.vue'
 import NewsContentComponent from  './NewsContent.vue'
+import AnnotationsContentComponent from  './AnnotationContent.vue'
 
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
@@ -123,6 +124,7 @@ export default {
     BookingCotentManageComponent,
     AlreadyBookingCotentManageComponent,
     NewsContentComponent,
+    AnnotationsContentComponent,
 
     ElContainer,
     ElHeader,
@@ -207,7 +209,7 @@ export default {
           this.selectedCategoryComponent = 'NewsContentComponent';
           break;
         case '5-2':
-          this.selectedCategoryComponent = 'BookingCotentManageComponent';
+          this.selectedCategoryComponent = 'AnnotationsContentComponent';
           break;
         
         case '6':

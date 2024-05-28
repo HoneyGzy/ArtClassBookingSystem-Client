@@ -129,7 +129,7 @@
       </el-dialog>
 
       <div class="annotation-container">
-        <!-- 最新通知 -->
+        <!-- 新闻 -->
         <div class="annotation-item">
           <h2 class="section-title">新闻</h2>
           <el-carousel :interval="3000">
@@ -145,7 +145,7 @@
           <!-- 在这里添加您的资讯内容 -->
           <el-list class="el-list-news">
             <el-list-item
-              v-for="(news, index) in latestNews"
+              v-for="(news, index) in paginatedNews"
               :key="index"
               class="news-item"
             >
@@ -154,20 +154,49 @@
                   <div class="grid-content date">{{ news.date }}</div>
                 </el-col>
                 <el-col :span="18">
-                  <div class="grid-content title">{{ news.title }}</div>
+                  <div
+                    class="grid-content title"
+                    @click="viewNewsDetail(news)"
+                    style="cursor: pointer; color: blue; text-decoration: underline;"
+                  >
+                    {{ news.title }}
+                  </div>
                 </el-col>
               </el-row>
             </el-list-item>
+            <el-pagination
+              v-if="latestNews.length > 5"
+              layout="prev, pager, next"
+              :total="latestNews.length"
+              :page-size="newsPerPage"
+              @current-change="handlePageChange"
+            ></el-pagination>
           </el-list>
+
+          <!-- 新闻详情模态框 -->
+          <el-dialog
+            title="新闻详情"
+            v-model="newsdialogVisible"
+            width="50%"
+            :before-close="handleClose"
+          >
+            <div v-if="currentNews">
+              <p><strong>日期：</strong>{{ currentNews.date }}</p>
+              <p><strong>标题：</strong>{{ currentNews.title }}</p>
+              <p><strong>内容：</strong>{{ currentNews.content }}</p>
+            </div>
+            <template #footer >
+              <el-button @click="newsdialogVisible = false">关闭</el-button>
+            </template>
+          </el-dialog>
         </div>
         
         <!-- 最新通知 -->
         <div class="annotation-item">
           <h2 class="section-title">最新通知</h2>
-          <!-- 在这里添加您的通知内容 -->
           <el-list class="el-list-news">
             <el-list-item
-              v-for="(news, index) in latestNews"
+              v-for="(news, index) in paginatedAnnotations"
               :key="index"
               class="news-item"
             >
@@ -176,11 +205,41 @@
                   <div class="grid-content date">{{ news.date }}</div>
                 </el-col>
                 <el-col :span="18">
-                  <div class="grid-content title">{{ news.title }}</div>
+                  <div
+                    class="grid-content title"
+                    @click="viewNewsDetail(news)"
+                    style="cursor: pointer; color: blue; text-decoration: underline;"
+                  >
+                    {{ news.title }}
+                  </div>
                 </el-col>
               </el-row>
             </el-list-item>
+            <el-pagination
+              v-if="latestAnnotation.length > 5"
+              layout="prev, pager, next"
+              :total="latestAnnotation.length"
+              :page-size="newsPerPage"
+              @current-change="handlePageChange"
+            ></el-pagination>
           </el-list>
+
+          <!-- 新闻详情模态框 -->
+          <el-dialog
+            title="通知详情"
+            v-model="annotationdialogVisible"
+            width="50%"
+            :before-close="handleClose"
+          >
+            <div v-if="currentAnnotations">
+              <p><strong>日期：</strong>{{ currentAnnotations.date }}</p>
+              <p><strong>标题：</strong>{{ currentAnnotations.title }}</p>
+              <p><strong>内容：</strong>{{ currentAnnotations.content }}</p>
+            </div>
+            <template #footer >
+              <el-button @click="annotationdialogVisible = false">关闭</el-button>
+            </template>
+          </el-dialog>
         </div>
       </div>
 
@@ -277,6 +336,11 @@ export default {
     return {
       dialogVisible: false,
       isCourseDialogVisible: false,
+      newsdialogVisible: false,
+      annotationdialogVisible:false,
+      currentNews: null,
+      currentAnnotations: null,
+    
       clickedCardIndex: null,
       categoryData: [],
       HotCourseInfo:{},
@@ -307,15 +371,11 @@ export default {
         {image: require('@/assets/icon/icons8-violin-100.png'),alt: '乐器',description: '乐器' },
       // 其他类别数据...
       ],
-      latestNews: [
-          { title: "资讯标题1", date: "2024-05-10" },
-          { title: "资讯标题2", date: "2024-05-09" },
-          { title: "资讯标题2", date: "2024-05-09" },
-          { title: "资讯标题2", date: "2024-05-09" },
-          { title: "资讯标题2", date: "2024-05-09" },
-          { title: "资讯标题2", date: "2024-05-09" },
-          // 添加更多资讯
-      ],
+      latestNews: [],
+      latestAnnotation:[],
+      //currentPage: 1,
+      newsPerPage: 5,
+
       searchResults: [],
       pagedResults: [],
       pageSize: 12,
@@ -332,6 +392,7 @@ export default {
   created() {
     this.fetchCourses();
     this.fetchNews();
+    this.fetchAnnotations();
     this.setUserName();
     // this.fetchMusicCourses();
     this.useusername = localStorage.getItem('userName');
@@ -349,9 +410,29 @@ export default {
           return '50%';
       }
     },
+    paginatedNews() {
+      const start = (this.currentPage - 1) * this.newsPerPage;
+      const end = start + this.newsPerPage;
+      return this.latestNews.slice(start, end);
+    },
+
+    paginatedAnnotations() {
+      const start = (this.currentPage - 1) * this.newsPerPage;
+      const end = start + this.newsPerPage;
+      return this.latestAnnotation.slice(start, end);
+    },
   },
   
   methods: {
+    handlePageChange(page) {
+      this.currentPage = page;
+    },
+    viewNewsDetail(news) {
+      // 在这里处理查看详情的逻辑，比如打开一个模态框展示详情内容
+      this.currentNews = news;
+      this.newsdialogVisible = true
+      console.log(news); // 你可以替换成你实际的查看详情逻辑
+    },
     async handleImageClick(subItem) {
       this.HotCourseInfo = subItem;
       this.isCourseDialogVisible = true;
@@ -475,6 +556,18 @@ export default {
       axios.get('http://localhost:3000/api/news')
         .then(response => {
           this.latestNews = response.data.map(news => ({
+            ...news,
+            date: this.formatDate(news.date)
+          }));
+        })
+        .catch(error => {
+          console.error("获取资讯列表失败：", error);
+        });
+    },
+    fetchAnnotations(){
+      axios.get('http://localhost:3000/api/annotations')
+        .then(response => {
+          this.latestAnnotation = response.data.map(news => ({
             ...news,
             date: this.formatDate(news.date)
           }));
