@@ -133,10 +133,28 @@
         <div class="annotation-item">
           <h2 class="section-title">新闻</h2>
           <el-carousel :interval="3000">
-            <el-carousel-item v-for="item in carouselItems" :key="item.index">
-              <img :src="item.image" class="image" alt="Image" />
+            <el-carousel-item
+              v-for="item in carouselItems"
+              :key="item.index"
+              @click="viewNewsPicDetail(item)"
+            >
+              <img :src="item.image" class="image" alt="Image" style="cursor: pointer;" />
             </el-carousel-item>
           </el-carousel>
+          <el-dialog
+            title="新闻详情"
+            v-model="newsPicDialogVisible"
+            width="50%"
+            :before-close="handleClose"
+          >
+            <div v-if="currentNewsPics">
+              <p><strong>标题：</strong>{{ currentNewsPics.title }}</p>
+              <p><strong>内容：</strong>{{ currentNewsPics.content }}</p>
+            </div>
+            <template #footer >
+              <el-button @click="newsPicDialogVisible = false">关闭</el-button>
+            </template>          
+          </el-dialog>
         </div>
 
         <!-- 最新资讯 -->
@@ -338,6 +356,9 @@ export default {
       isCourseDialogVisible: false,
       newsdialogVisible: false,
       annotationdialogVisible:false,
+      newsPicDialogVisible: false,
+      
+      currentNewsPics: null,
       currentNews: null,
       currentAnnotations: null,
     

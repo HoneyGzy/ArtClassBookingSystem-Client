@@ -66,6 +66,7 @@
           <el-menu-item-group class="custom-sub-menu-title">
             <el-menu-item index="5-1"  @click="handleNavSelection('5-1')">资讯管理</el-menu-item>
             <el-menu-item index="5-2"  @click="handleNavSelection('5-2')">公告管理</el-menu-item>
+            <el-menu-item index="5-3"  @click="handleNavSelection('5-3')">新闻管理</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
       </el-menu>
@@ -100,6 +101,7 @@ import BookingCotentManageComponent from './BookingCotentManageComponent.vue'
 import AlreadyBookingCotentManageComponent from './AlreadyBookingCotentManageComponent.vue'
 import NewsContentComponent from  './NewsContent.vue'
 import AnnotationsContentComponent from  './AnnotationContent.vue'
+import NewsContentPicComponent from './NewsContentPic.vue'
 
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
 
@@ -125,6 +127,7 @@ export default {
     AlreadyBookingCotentManageComponent,
     NewsContentComponent,
     AnnotationsContentComponent,
+    NewsContentPicComponent,
 
     ElContainer,
     ElHeader,
@@ -211,7 +214,9 @@ export default {
         case '5-2':
           this.selectedCategoryComponent = 'AnnotationsContentComponent';
           break;
-        
+        case '5-3':
+          this.selectedCategoryComponent = 'NewsContentPicComponent';
+          break;
         case '6':
           this.selectedCategoryComponent = 'BookingCotentManageComponent';
           break;    
