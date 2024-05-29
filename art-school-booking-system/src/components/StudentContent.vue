@@ -135,10 +135,10 @@
           <el-carousel :interval="3000">
             <el-carousel-item
               v-for="item in carouselItems"
-              :key="item.index"
+              :key="item.id"
               @click="viewNewsPicDetail(item)"
             >
-              <img :src="item.image" class="image" alt="Image" style="cursor: pointer;" />
+              <img :src="item.image_url" class="carousel-item-img" alt="Image" style="cursor: pointer;" />
             </el-carousel-item>
           </el-carousel>
           <el-dialog
@@ -148,6 +148,7 @@
             :before-close="handleClose"
           >
             <div v-if="currentNewsPics">
+              <p><strong>日期：</strong>{{ currentNewsPics.publish_date }}</p>
               <p><strong>标题：</strong>{{ currentNewsPics.title }}</p>
               <p><strong>内容：</strong>{{ currentNewsPics.content }}</p>
             </div>
@@ -191,17 +192,17 @@
             ></el-pagination>
           </el-list>
 
-          <!-- 新闻详情模态框 -->
+          <!-- 资讯详情模态框 -->
           <el-dialog
-            title="新闻详情"
+            title="资讯详情"
             v-model="newsdialogVisible"
             width="50%"
             :before-close="handleClose"
           >
-            <div v-if="currentNews">
-              <p><strong>日期：</strong>{{ currentNews.date }}</p>
-              <p><strong>标题：</strong>{{ currentNews.title }}</p>
-              <p><strong>内容：</strong>{{ currentNews.content }}</p>
+            <div v-if="currentInfo">
+              <p><strong>日期：</strong>{{ currentInfo.date }}</p>
+              <p><strong>标题：</strong>{{ currentInfo.title }}</p>
+              <p><strong>内容：</strong>{{ currentInfo.content }}</p>
             </div>
             <template #footer >
               <el-button @click="newsdialogVisible = false">关闭</el-button>
@@ -242,7 +243,7 @@
             ></el-pagination>
           </el-list>
 
-          <!-- 新闻详情模态框 -->
+          <!-- 通知公告模态框 -->
           <el-dialog
             title="通知详情"
             v-model="annotationdialogVisible"
@@ -316,8 +317,6 @@
           </el-form>
           <el-button class="submit-button" type="primary" @click="submitForm('form')">提交</el-button>
       </div>
-
-
     </el-main>
 
     <!-- 帮助与支持 -->
@@ -359,7 +358,7 @@ export default {
       newsPicDialogVisible: false,
       
       currentNewsPics: null,
-      currentNews: null,
+      currentInfo: null,
       currentAnnotations: null,
     
       clickedCardIndex: null,
@@ -413,6 +412,7 @@ export default {
   created() {
     this.fetchCourses();
     this.fetchNews();
+    this.fetchNewsPic();
     this.fetchAnnotations();
     this.setUserName();
     // this.fetchMusicCourses();
@@ -445,12 +445,20 @@ export default {
   },
   
   methods: {
+    viewNewsPicDetail(item){
+        this.currentNewsPics =item;
+        console.log(item)
+        this.newsPicDialogVisible = true;
+    },
+
+
+
     handlePageChange(page) {
       this.currentPage = page;
     },
     viewNewsDetail(news) {
       // 在这里处理查看详情的逻辑，比如打开一个模态框展示详情内容
-      this.currentNews = news;
+      this.currentInfo = news;
       this.newsdialogVisible = true
       console.log(news); // 你可以替换成你实际的查看详情逻辑
     },
@@ -529,13 +537,31 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('提交成功!');
+          // 如果验证成功，进行表单提交
+          axios.post('http://localhost:3000/api/contact', this.form)
+            .then(response => {
+              console.log(response)
+              this.$message({
+                message: '提交成功！',
+                type: 'success'
+              });
+              // 清空表单
+              this.$refs[formName].resetFields();
+            })
+            .catch(error => {
+              this.$message({
+                message: '提交失败，请稍后再试。',
+                type: 'error'
+              });
+              console.error(error);
+            });
         } else {
-          console.log('error submit!!');
+          console.log('验证失败，请检查输入');
           return false;
         }
       });
     },
+
     redirectItem(link) {
         window.location.href = link;
     },
@@ -561,8 +587,8 @@ export default {
             
             return course;
           });
-          this.carouselItems = this.hotList;
-          console.log(`hotlist: ${this.carouselItems}`);
+          // this.carouselItems = this.hotList;
+          // console.log(`hotlist: ${this.carouselItems}`);
 
           let chunkSize = 3;
           for (let i = 0; i < this.hotList.length; i += chunkSize) {
@@ -573,6 +599,34 @@ export default {
           console.error(error);
         })
     },
+    fetchNewsPic() {
+      axios.get('http://localhost:3000/api/news_images')
+        .then(response => {
+          // 判断API返回的数据是否为数组
+          if(!response.data || !Array.isArray(response.data)) {
+            console.error("Invalid API response");
+            return;
+          }
+          // 使用map方法处理每一条新闻信息
+          this.carouselItems = response.data.map(item => {
+            // 构建图片的完整URL，替换其中的反斜杠以符合URL的格式
+            const imageURL = `http://localhost:3000/${item.image_path.replace(/\\/g, "/")}`;
+
+            console.log(`News title: ${item.title}`);
+            console.log(`Image URL: ${imageURL}`);
+
+            // 返回处理后的对象，包含完整的图片URL和其他字段
+            return {
+              ...item,
+              image_url: imageURL
+            };
+          });
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+
     fetchNews() {
       axios.get('http://localhost:3000/api/news')
         .then(response => {

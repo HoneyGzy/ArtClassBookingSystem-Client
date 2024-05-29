@@ -36,7 +36,7 @@
           <el-carousel trigger="click" arrow="always">
             <el-carousel-item v-for="(item, index) in chunkedHotList" :key="index">
               <div class="carousel-item-container">
-                <div class="carousel-item" v-for="(subItem, subIndex) in item" :key="`subItem-${subIndex}`" @click="handleImageClick(subItem)">
+                <div class="carousel-item" v-for="(subItem, subIndex) in item" :key="`subItem-${subIndex}`" @click="handleClick(subItem)">
                   <img :src="subItem.image" alt="" class="carousel-item-img">
                   <p>{{ subItem.title }}</p>
                 </div>        
@@ -45,18 +45,6 @@
           </el-carousel>
         </div>
       </div>
-       <!-- 课程模态框 -->
-      <el-dialog
-        v-model="isCourseDialogVisible"
-        width="30%"
-        :before-close="handleCourseDialogClose">
-        <!-- 把searchResults作为Prop传递给CourseCard组件 -->
-          <CourseSingleCard :course="HotCourseInfo" >
-          </CourseSingleCard>
-        <template #footer>
-        <el-button @click="isCourseDialogVisible = false">关闭</el-button>
-        </template>
-      </el-dialog>
 
       <!-- 艺术课程分类 -->
       <div class="course-category-section">
@@ -81,37 +69,18 @@
           <template #footer>
             <el-button @click="dialogVisible = false">取消</el-button>
             <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-                </template>
+          </template>
       </el-dialog>
 
       <div class="annotation-container">
-        <!-- 新闻 -->
+        <!-- 最新通知 -->
         <div class="annotation-item">
           <h2 class="section-title">新闻</h2>
           <el-carousel :interval="3000">
-            <el-carousel-item
-              v-for="item in carouselItems"
-              :key="item.id"
-              @click="viewNewsPicDetail(item)"
-            >
-              <img :src="item.image_url" class="carousel-item-img" alt="Image" style="cursor: pointer;" />
+            <el-carousel-item v-for="item in carouselItems" :key="item.index">
+              <img :src="item.image" class="image" alt="Image" />
             </el-carousel-item>
           </el-carousel>
-          <el-dialog
-            title="新闻详情"
-            v-model="newsPicDialogVisible"
-            width="50%"
-            :before-close="handleClose"
-          >
-            <div v-if="currentNewsPics">
-              <p><strong>日期：</strong>{{ currentNewsPics.publish_date }}</p>
-              <p><strong>标题：</strong>{{ currentNewsPics.title }}</p>
-              <p><strong>内容：</strong>{{ currentNewsPics.content }}</p>
-            </div>
-            <template #footer >
-              <el-button @click="newsPicDialogVisible = false">关闭</el-button>
-            </template>          
-          </el-dialog>
         </div>
 
         <!-- 最新资讯 -->
@@ -120,7 +89,7 @@
           <!-- 在这里添加您的资讯内容 -->
           <el-list class="el-list-news">
             <el-list-item
-              v-for="(news, index) in paginatedNews"
+              v-for="(news, index) in latestNews"
               :key="index"
               class="news-item"
             >
@@ -129,49 +98,20 @@
                   <div class="grid-content date">{{ news.date }}</div>
                 </el-col>
                 <el-col :span="18">
-                  <div
-                    class="grid-content title"
-                    @click="viewNewsDetail(news)"
-                    style="cursor: pointer; color: blue; text-decoration: underline;"
-                  >
-                    {{ news.title }}
-                  </div>
+                  <div class="grid-content title">{{ news.title }}</div>
                 </el-col>
               </el-row>
             </el-list-item>
-            <el-pagination
-              v-if="latestNews.length > 5"
-              layout="prev, pager, next"
-              :total="latestNews.length"
-              :page-size="newsPerPage"
-              @current-change="handlePageChange"
-            ></el-pagination>
           </el-list>
-
-          <!-- 资讯详情模态框 -->
-          <el-dialog
-            title="资讯详情"
-            v-model="newsdialogVisible"
-            width="50%"
-            :before-close="handleClose"
-          >
-            <div v-if="currentInfo">
-              <p><strong>日期：</strong>{{ currentInfo.date }}</p>
-              <p><strong>标题：</strong>{{ currentInfo.title }}</p>
-              <p><strong>内容：</strong>{{ currentInfo.content }}</p>
-            </div>
-            <template #footer >
-              <el-button @click="newsdialogVisible = false">关闭</el-button>
-            </template>
-          </el-dialog>
         </div>
         
         <!-- 最新通知 -->
         <div class="annotation-item">
           <h2 class="section-title">最新通知</h2>
+          <!-- 在这里添加您的通知内容 -->
           <el-list class="el-list-news">
             <el-list-item
-              v-for="(news, index) in paginatedAnnotations"
+              v-for="(news, index) in latestNews"
               :key="index"
               class="news-item"
             >
@@ -180,45 +120,13 @@
                   <div class="grid-content date">{{ news.date }}</div>
                 </el-col>
                 <el-col :span="18">
-                  <div
-                    class="grid-content title"
-                    @click="viewNewsDetail(news)"
-                    style="cursor: pointer; color: blue; text-decoration: underline;"
-                  >
-                    {{ news.title }}
-                  </div>
+                  <div class="grid-content title">{{ news.title }}</div>
                 </el-col>
               </el-row>
             </el-list-item>
-            <el-pagination
-              v-if="latestAnnotation.length > 5"
-              layout="prev, pager, next"
-              :total="latestAnnotation.length"
-              :page-size="newsPerPage"
-              @current-change="handlePageChange"
-            ></el-pagination>
           </el-list>
-
-          <!-- 通知公告模态框 -->
-          <el-dialog
-            title="通知详情"
-            v-model="annotationdialogVisible"
-            width="50%"
-            :before-close="handleClose"
-          >
-            <div v-if="currentAnnotations">
-              <p><strong>日期：</strong>{{ currentAnnotations.date }}</p>
-              <p><strong>标题：</strong>{{ currentAnnotations.title }}</p>
-              <p><strong>内容：</strong>{{ currentAnnotations.content }}</p>
-            </div>
-            <template #footer >
-              <el-button @click="annotationdialogVisible = false">关闭</el-button>
-            </template>
-          </el-dialog>
         </div>
       </div>
-
-      
 
       <!-- 联系我们 -->
       <div class="quick-access-section">
@@ -245,6 +153,8 @@
           </el-form>
           <el-button class="submit-button" type="primary" @click="submitForm('form')">提交</el-button>
       </div>
+
+
     </el-main>
 
     <!-- 帮助与支持 -->
@@ -259,32 +169,10 @@
 <script>
 
 import axios from 'axios';
-import CourseSingleCard from './CourseCardSingle.vue';
-
-
-
-
 // Vue 组件
 export default {
-  components: {
-    CourseSingleCard
-  },
   data() {
     return {
-      dialogVisible: false,
-      isCourseDialogVisible: false,
-      newsdialogVisible: false,
-      annotationdialogVisible:false,
-      newsPicDialogVisible: false,
-      
-      currentNewsPics: null,
-      currentInfo: null,
-      currentAnnotations: null,
-    
-      clickedCardIndex: null,
-      categoryData: [],
-      HotCourseInfo:{},
-      username: null,
       form: {
         name: '',
         phone: '',
@@ -315,98 +203,28 @@ export default {
         {image: require('@/assets/icon/icons8-violin-100.png'),alt: '乐器',description: '乐器' },
       // 其他类别数据...
       ],
-      latestNews: [],
-      latestAnnotation:[],
-      //currentPage: 1,
-      newsPerPage: 5,
-
-      searchResults: [],
-      pagedResults: [],
-      pageSize: 12,
-      currentPage: 1,
-
-      isReserveDialogVisible: false,
-      selectedCourse: {},
-
-      fastentrydialogVisible: false, // 控制模态框的显示和隐藏
-      dialogContent: '', // 模态框中显示的内容
-      currentIndex: null,
+      latestNews: [
+          { title: "资讯标题1", date: "2024-05-10" },
+          { title: "资讯标题2", date: "2024-05-09" },
+          { title: "资讯标题2", date: "2024-05-09" },
+          { title: "资讯标题2", date: "2024-05-09" },
+          { title: "资讯标题2", date: "2024-05-09" },
+          { title: "资讯标题2", date: "2024-05-09" },
+          // 添加更多资讯
+        ],
+        dialogVisible: false,
+        dialogContent: '',
     };
   },
   created() {
     this.fetchCourses();
-    this.fetchNews();
-    this.fetchNewsPic();
-    this.fetchAnnotations();
-    this.setUserName();
-    // this.fetchMusicCourses();
-    this.useusername = localStorage.getItem('userName');
   },
-
-  computed: {
-    dialogWidth() {
-      switch (this.currentIndex) {
-        case 0:
-          return '80%';
-        case 1:
-          return '30%';
-        // 在这里为更多的索引设置宽度
-        default:
-          return '50%';
-      }
-    },
-    paginatedNews() {
-      const start = (this.currentPage - 1) * this.newsPerPage;
-      const end = start + this.newsPerPage;
-      return this.latestNews.slice(start, end);
-    },
-    paginatedAnnotations() {
-      const start = (this.currentPage - 1) * this.newsPerPage;
-      const end = start + this.newsPerPage;
-      return this.latestAnnotation.slice(start, end);
-    },
-  },
-  
   methods: {
-    handleLogin() {
+      handleLogin() {
         this.$router.push('/login');
       },
-
-    viewNewsPicDetail(item){
-        this.currentNewsPics =item;
-        console.log(item)
-        this.newsPicDialogVisible = true;
-    },
-
-    handlePageChange(page) {
-      this.currentPage = page;
-    },
-
-    viewNewsDetail(news) {
-      // 在这里处理查看详情的逻辑，比如打开一个模态框展示详情内容
-      this.currentInfo = news;
-      this.newsdialogVisible = true
-      console.log(news); // 你可以替换成你实际的查看详情逻辑
-    },
-    async handleImageClick(subItem) {
-      this.HotCourseInfo = subItem;
-      this.isCourseDialogVisible = true;
-      try {
-        // 等待axios请求完成
-        const response = await axios.get(`http://localhost:3000/api/courses/${subItem.course_id}`);
-        this.HotCourseInfo = response.data; // 假设返回的数据中即包含课程信息
-        console.log(response.data);
-      } catch (error) {
-        console.error('获取课程信息失败', error);
-        this.isCourseDialogVisible = false;
-      }
-    },
-    handleCourseDialogClose() {
-      this.isCourseDialogVisible = false;
-      this.HotCourseInfo = {};
-    },
-    handleCardClick(idx) {
-      console.log(idx)
+      handleCardClick(idx){
+        console.log(idx)
         this.dialogVisible = true
 
         switch(idx) {
@@ -437,208 +255,66 @@ export default {
           default:
             break;
         }
-    },
-    handlePagination() {
-      const start = (this.currentPage - 1) * this.pageSize;
-      const end = start + this.pageSize;
-      this.pagedResults = this.searchResults.slice(start, end);
-    },
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.handlePagination();
-    },
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.handlePagination();
-    },
-    openReserveDialog(course) {
-      console.log(course)
-      this.selectedCourse = course;
-      this.isReserveDialogVisible = true;
-    },
-
-
-    logout() {
-      // 清除localStorage中的用户数据
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userToken');
-      // 使用Vue Router重定向到登录页面
-      this.$router.push({ name: 'Login' });
-    },
-    setUserName()
-    {
-      // 从 localStorage 获取用户角色
-      this.username = localStorage.getItem('userName');
-      console.log('Current user name:', this.username);
-    },
-    submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          // 如果验证成功，进行表单提交
-          axios.post('http://localhost:3000/api/contact', this.form)
-            .then(response => {
-              console.log(response)
-              this.$message({
-                message: '提交成功！',
-                type: 'success'
-              });
-              // 清空表单
-              this.$refs[formName].resetFields();
-            })
-            .catch(error => {
-              this.$message({
-                message: '提交失败，请稍后再试。',
-                type: 'error'
-              });
-              console.error(error);
-            });
-        } else {
-          console.log('验证失败，请检查输入');
-          return false;
-        }
-      });
-    },
-
-    redirectItem(link) {
-        window.location.href = link;
-    },
-    fetchCourses() {
-      axios.get('http://localhost:3000/api/courses_images')
-        .then(response => {
-          if(!response.data || !Array.isArray(response.data)) {
-            console.error("Invalid API response");
-            return;
+        // const category = this.categories[idx]
+      },
+      handleClose() {
+        this.dialogVisible = false; // 取消显示对话框
+      },
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            alert('提交成功!');
+          } else {
+            console.log('error submit!!');
+            return false;
           }
-          this.hotList = response.data.map(course => {
-            if (course.image && course.image.data) {
-              // Convert the ASCII values in the array to a string
-              var imagePath = course.image.data.map(c => String.fromCharCode(c)).join('');
-              
-              // Create the URL to the image
-              course.image = 'http://localhost:3000/' + imagePath;
-              console.log(course.image)
+        });
+      },
+      redirectItem(link) {
+         window.location.href = link;
+      },
+      fetchCourses() {
+        axios.get('http://localhost:3000/api/courses_images')
+          .then(response => {
+            if(!response.data || !Array.isArray(response.data)) {
+              console.error("Invalid API response");
+              return;
             }
-            console.log(`Course title: ${course.title}`);
-            console.log(`Image URL: ${course.image}`);
+            this.hotList = response.data.map(course => {
+              if (course.image && course.image.data) {
+                // Convert the ASCII values in the array to a string
+                var imagePath = course.image.data.map(c => String.fromCharCode(c)).join('');
+                
+                // Create the URL to the image
+                course.image = 'http://localhost:3000/' + imagePath;
+                console.log(course.image)
+              }
+              console.log(`Course title: ${course.title}`);
+              console.log(`Image URL: ${course.image}`);
 
-            
-            return course;
-          });
-          // this.carouselItems = this.hotList;
-          // console.log(`hotlist: ${this.carouselItems}`);
+              
+              return course;
+            });
+            this.carouselItems = this.hotList;
+            console.log(`hotlist: ${this.carouselItems}`);
 
-          let chunkSize = 3;
-          for (let i = 0; i < this.hotList.length; i += chunkSize) {
-            this.chunkedHotList.push(this.hotList.slice(i,i+chunkSize));
-          }
-        })
-        .catch(error => {
-          console.error(error);
-        })
-    },
-    fetchNewsPic() {
-      axios.get('http://localhost:3000/api/news_images')
-        .then(response => {
-          // 判断API返回的数据是否为数组
-          if(!response.data || !Array.isArray(response.data)) {
-            console.error("Invalid API response");
-            return;
-          }
-          // 使用map方法处理每一条新闻信息
-          this.carouselItems = response.data.map(item => {
-            // 构建图片的完整URL，替换其中的反斜杠以符合URL的格式
-            const imageURL = `http://localhost:3000/${item.image_path.replace(/\\/g, "/")}`;
-
-            console.log(`News title: ${item.title}`);
-            console.log(`Image URL: ${imageURL}`);
-
-            // 返回处理后的对象，包含完整的图片URL和其他字段
-            return {
-              ...item,
-              image_url: imageURL
-            };
-          });
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    },
-
-    fetchNews() {
-      axios.get('http://localhost:3000/api/news')
-        .then(response => {
-          this.latestNews = response.data.map(news => ({
-            ...news,
-            date: this.formatDate(news.date)
-          }));
-        })
-        .catch(error => {
-          console.error("获取资讯列表失败：", error);
-        });
-    },
-    fetchAnnotations(){
-      axios.get('http://localhost:3000/api/annotations')
-        .then(response => {
-          this.latestAnnotation = response.data.map(news => ({
-            ...news,
-            date: this.formatDate(news.date)
-          }));
-        })
-        .catch(error => {
-          console.error("获取资讯列表失败：", error);
-        });
-    },
-    formatDate(dateString) {
-      const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-    handleClick(index) {
-      this.currentIndex = index; // 记录当前点击的index
-      this.dialogContent = this.cards[index].content; // 设置模态框中显示的内容
-      this.fastentrydialogVisible = true; // 显示模态框
-      
-    },
-    async submitReserve() {
-      try {
-        // 提取出用户名和课程ID
-        const users = this.useusername;
-        const courseId = this.selectedCourse.course_id;
-        const courseTitle = this.selectedCourse.title;
-
-        // 发送预约请求
-        const response = await axios.post('http://localhost:3000/api/postReservation', {
-          users,
-          courseId,
-          courseTitle
-        });
-
-        // 判断预约状态，如果预约成功则使用你的原始逻辑，如果预约失败则使用新的逻辑
-        if (response.data.status === "error") {
-          // 抛出错误，调用catch块中的错误处理
-          throw response.data.message;
-        } else {
-          // 解析响应
-          const { reservationStatus, courseTime } = response.data;
-
-          // 更新预约状态
-          this.isReserveDialogVisible = false;
-          this.reservationStatus = reservationStatus;
-          this.courseTime = courseTime;
-
-          // 显示成功消息
-          this.$message.success('预约成功！等待管理员处理');
-        }
-
-      } catch (error) {
-        console.error(error);
-        // 使用后端返回的错误消息
-        this.$message.error(error);
-      }
-    }
-  }
+            let chunkSize = 3;
+            for (let i = 0; i < this.hotList.length; i += chunkSize) {
+              this.chunkedHotList.push(this.hotList.slice(i,i+chunkSize));
+            }
+          })
+          .catch(error => {
+            console.error(error);
+          })
+      },
+      handleClick(subItem) {
+        // 这里可以处理点击事件，subItem是点击的那个图片的数据
+        // 例如，你可以使用Vue Router来进行页面跳转：
+        console.log(subItem)
+        //this.$router.push({ name: 'CourseDetail', params: { id: subItem.id}})
+        // name是路由名，id是参数，你可以根据你的需要进行修改
+      },
+   }
 };
 
 
@@ -715,6 +391,16 @@ export default {
   /* 按钮共同样式 */
 }
 
+/* 单独为注册和登录按钮定制的样式 */
+.auth-buttons .register {
+
+}
+
+.auth-buttons .login {
+  /* 特定于登录按钮的样式 */
+
+}
+
 .wrapper {
   
   margin: 0 auto;
@@ -758,18 +444,23 @@ export default {
 
 .el-card {
      height: 300px; /* 或你想要设置的其他值 */
-     transition: transform 0.3s ease-in-out;
+     /* transition: transform 0.3s ease-in-out; */
+}
+.course-sorts
+{
+  transition: transform 0.3s ease-in-out;
+
 }
 
-.el-card:hover {
+.course-sorts:hover {
   transform: scale(1.05);
 }
 
-/* .carousel-item-img {
-  height: 55%; 
+.carousel-item-img {
+  height: 55%; /* 根据你的需求调整这个值 */
   width: auto;
   object-fit: cover;
-} */
+}
 
 .el-carousel, .el-carousel-item {
   height: auto; /* 或者一个具体的值，比如 '300px' */
@@ -777,27 +468,13 @@ export default {
 
 .carousel-item-container {
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 100%;
+  justify-content: space-between;
 }
-
-/* .carousel-item {
-  width: 33.33%;
-} */
 
 .carousel-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 33.33%;
 }
 
-.carousel-item-img {
-  width: 97%;
-  height: auto;
-  object-fit: cover; /* 保持图像等比例缩放并裁剪 */
-}
 .carousel-item:nth-child(3n) {
   margin-right: 0;  /* 每行的第三张图片不添加右边距 */
 }
@@ -850,21 +527,5 @@ export default {
 .contact-title
 {
   margin-top: 20px;
-}
-
-
-.logout-button {
-  padding: 5px 15px;
-  color: #fff;
-  background-color: #1767fd; /* 按钮背景颜色 */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  outline: none;
-  margin-left:20px;
-}
-
-.logout-button:hover {
-  background-color: #111aa0;
 }
 </style>

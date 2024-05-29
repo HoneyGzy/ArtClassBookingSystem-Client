@@ -88,7 +88,7 @@ import HotRecommend from './HotRecommend.vue';
 import SearchComponent from './SearchContent.vue'
 import CourseBookingCotent from'./CourseBookingCotent.vue'
 import UserManagerComponent from './UserManagerContent.vue'
-import EvaluationManagementComponent from './EvaluationManagement.vue'
+import EvaluationManagementComponent from './EvaluationAdminManagement.vue'
 import UserCenterComponent from './UserCenter.vue'
 import CourseRegistration from './CourseRegistration.vue'
 import CourseListComponent from './CourseListContent.vue'
