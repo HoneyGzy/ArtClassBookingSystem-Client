@@ -2,7 +2,7 @@
   <div class="search-component">
     <el-container direction="vertical">
       <el-header height="auto">
-        <!--搜索输入和建议-->
+        <!-- 搜索输入和建议 -->
         <el-autocomplete
           class="input-item"
           v-model="searchQuery"
@@ -11,7 +11,7 @@
           @select="handleSelect"
         ></el-autocomplete>
 
-        <!--分类筛选-->
+        <!-- 分类筛选 -->
         <el-select class="select-item" v-model="selectedCategory" placeholder="所有分类">
           <el-option
             v-for="category in categories"
@@ -31,63 +31,46 @@
           ></el-option>
         </el-select>
 
-        <!--搜索按钮-->
+        <!-- 搜索按钮 -->
         <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </el-header>
 
-      <!--搜索结果-->
+      <!-- 搜索结果 -->
       <el-main>
         <el-row :gutter="20">
-          <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="result in searchResults" :key="result.id">
-            <el-card shadow="hover" style="margin-bottom: 20px">
-              <div>
-                <div class="content-field">
-                  <el-tag size="small" effect="plain">课程名称</el-tag>
-                  <h2 class="el-typography">{{ result.title }}</h2>
-                </div>
-
-                <el-divider></el-divider>
-
-                <div class="content-field">
-                  <span class="content-label content-tag"><el-tag size="small" effect="plain">描述</el-tag></span>
-                  <div class="content-description">{{ result.description }}</div>
-                </div>
-
-                <el-divider></el-divider>
-
-                <div class="meta">
-                  <div class="content-field">
-                    <el-tag size="small" effect="plain">教师</el-tag>
-                    <el-tag>{{ result.teacher }}</el-tag>
-                  </div>
-                  <div class="content-field">
-                    <el-tag size="small" effect="plain">时长</el-tag>
-                    <el-tag type="success">{{ result.duration }} 分钟</el-tag>
-                  </div>
-                  <div class="content-field">
-                    <el-tag size="small" effect="plain">日期</el-tag>
-                    <el-tag type="info">{{ new Date(result.date).toLocaleDateString() }}</el-tag>
-                  </div>
-                  <div class="content-field">
-                    <el-tag size="small" effect="plain">价格</el-tag>
-                    <el-tag type="warning">¥{{ result.price }}</el-tag>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
+          <!-- 传递搜索结果到 CourseCard 组件 -->
+          <CourseCard 
+            v-for="course in pagedResults" 
+            :key="course.id"
+            :searchResults="[course]"
+          >
+            <template #extra>
+              <el-button type="primary" @click="openReserveDialog(course)">预约课程</el-button>
+            </template>
+          </CourseCard>
         </el-row>
+        <el-pagination
+            layout="total, sizes, prev, pager, next"
+            :total="searchResults.length"
+            :page-size="pageSize"
+            :current-page="currentPage"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+        ></el-pagination>
       </el-main>
     </el-container>
   </div>
 </template>
 
-
 <script>
 import axios from 'axios';
+import CourseCard from './CourseCard.vue';
 
 export default {
   name: 'SearchComponent',
+  components: {
+    CourseCard,
+  },
   data() {
     return {
       searchQuery: '',
@@ -95,24 +78,21 @@ export default {
       selectedSort: '',
       suggestions: [],
       searchResults: [],
-      categories: ['技术', '艺术', '语言', '科学'], // 示例分类
+      categories: ['音乐分类', '舞蹈分类', '绘画分类', '书法分类', '设计分类', '雕塑分类', '摄影分类', '乐器分类'], // 示例分类
       sorts: [
         { text: '按相关性排序', value: 'relevance' },
         { text: '按最新排序', value: 'newest' },
         { text: '按评分排序', value: 'rating' },
       ],
+      pagedResults: [],
+      pageSize: 4,
+      currentPage: 1,
     };
   },
   methods: {
-    suggest() {
-      // 这里应该是访问后端接口的 API 调用
-      // 根据用户输入查询建议
-      // 示例中我们只用了本地过滤
-      this.suggestions = this.searchQuery
-        ? this.categories.filter((c) =>
-            c.toLowerCase().includes(this.searchQuery.toLowerCase()),
-          )
-        : [];
+    suggest(queryString, callback) {
+      // 模拟后台返回建议
+      callback(this.categories.filter(c => c.toLowerCase().includes(queryString.toLowerCase())));
     },
     search() {
       axios.get('http://localhost:3000/api/search', {
@@ -123,14 +103,30 @@ export default {
         }
       })
       .then(response => {
-        // 处理成功响应
         this.searchResults = response.data;
+        this.handlePagination(); // 搜索完成后立即进行分页处理
       })
       .catch(error => {
-        // 处理错误响应
         console.error('There was an error!', error);
       });
     },
+    handlePagination() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      this.pagedResults = this.searchResults.slice(start, end);
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.handlePagination();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.handlePagination();
+    },
+    openReserveDialog(course) {
+      console.log("预订课程: ", course);
+      // 您的逻辑
+    }
   },
 };
 </script>
@@ -139,6 +135,7 @@ export default {
 .search-component {
   justify-content: center;
   padding: 20px;
+  height: 50vh;
 }
 
 .search-component .el-header {
@@ -161,8 +158,6 @@ export default {
 .box-card {
   margin-bottom: 20px;
 }
-
-
 
 .content-field {
   display: flex;

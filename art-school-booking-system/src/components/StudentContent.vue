@@ -267,7 +267,7 @@
         <div class="wrapper">
           <h2 class="section-title">快捷入口</h2>
           <el-row :gutter="20" class="content-display">
-              <el-col :span="8" v-for="(card, i) in cards" :key="i"  @click="handleClick(i)">
+              <el-col :span="6" v-for="(card, i) in cards" :key="i"  @click="handleClick(i)">
                   <el-card>
                       <img :src="card.logo">
                       <p>{{ card.content }}</p>
@@ -281,7 +281,7 @@
             <course-registration v-if="currentIndex === 0"></course-registration>
             <evaluation-management v-else-if="currentIndex === 1"></evaluation-management>
             <usercenter-coponent  v-else-if="currentIndex === 2"></usercenter-coponent>
-
+            <search-component> v-else-if="currentIndex === 3"></search-component>
             <!-- <span>{{ dialogContent }}</span> -->
             <template v-slot:footer>
               <span class="dialog-footer">
@@ -378,6 +378,7 @@ export default {
         { logo: require('@/assets/icon/icons8-registration-100.png'), content: '购课支付' },
         { logo: require('@/assets/icon/icons8-comments-100.png'), content: '评价中心' },
         { logo: require('@/assets/icon/icons8-user-100.png'), content: '用户中心' },
+        { logo: require('@/assets/icon/icons8-search-100.png'),content: '课程搜索'}
       ],
       categories: ['music', 'dance', 'draw', 'calligraphy', 'design', 'sculpture', 'photo', 'musical'],
       course_categories: [
