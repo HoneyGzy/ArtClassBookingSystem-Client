@@ -21,16 +21,6 @@
           ></el-option>
         </el-select>
 
-        <!-- 排序选项 -->
-        <el-select class="select-item" v-model="selectedSort" placeholder="默认排序">
-          <el-option
-            v-for="sort in sorts"
-            :key="sort.value"
-            :label="sort.text"
-            :value="sort.value"
-          ></el-option>
-        </el-select>
-
         <!-- 搜索按钮 -->
         <el-button type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </el-header>
@@ -57,6 +47,37 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
         ></el-pagination>
+        <!-- 预约课程模态框 -->
+      <el-dialog
+        v-model="isReserveDialogVisible"
+        width="40%"
+        >
+        <div class="dialog-container">
+          <h2 class="dialog-title">课程预约</h2>
+          <el-row :gutter="20">
+            <el-col :span="24">
+              <div class="dialog-item">
+                <span class="dialog-item-title">课程名称：</span>
+                <el-tag>{{ selectedCourse.title }}</el-tag>
+              </div>
+            </el-col>
+            <el-col :span="24">
+              <div class="dialog-item">
+                <span class="dialog-item-title">教师：</span>
+                <el-tag>{{ selectedCourse.teacher }}</el-tag>
+              </div>
+            </el-col>
+          </el-row>
+          <!-- 添加更多课程信息和预约表单 -->
+        </div>
+        <template #footer>
+          <el-button class="dialog-button" @click="isReserveDialogVisible = false">取消</el-button>
+          <el-button class="dialog-button" type="primary" @click="submitReserve">
+            <i class="el-icon-check"></i>
+            确认预约
+          </el-button>
+        </template>
+        </el-dialog>
       </el-main>
     </el-container>
   </div>
@@ -78,16 +99,19 @@ export default {
       selectedSort: '',
       suggestions: [],
       searchResults: [],
-      categories: ['音乐分类', '舞蹈分类', '绘画分类', '书法分类', '设计分类', '雕塑分类', '摄影分类', '乐器分类'], // 示例分类
-      sorts: [
-        { text: '按相关性排序', value: 'relevance' },
-        { text: '按最新排序', value: 'newest' },
-        { text: '按评分排序', value: 'rating' },
-      ],
+      categories: ['音乐', '舞蹈', '绘画', '书法', '设计', '雕塑', '摄影', '乐器'], // 示例分类
       pagedResults: [],
       pageSize: 4,
       currentPage: 1,
+      isReserveDialogVisible: false,
+      selectedCourse: {},
+      userName : ''
+
     };
+  },
+  created()
+  {
+    this.userName = localStorage.getItem('userName');
   },
   methods: {
     suggest(queryString, callback) {
@@ -125,7 +149,45 @@ export default {
     },
     openReserveDialog(course) {
       console.log("预订课程: ", course);
-      // 您的逻辑
+      this.selectedCourse = course;
+      this.isReserveDialogVisible = true;
+    },
+    async submitReserve() {
+      try {
+        // 提取出用户名和课程ID
+        const users = this.userName;
+        const courseId = this.selectedCourse.course_id;
+        const courseTitle = this.selectedCourse.title;
+
+        // 发送预约请求
+        const response = await axios.post('http://localhost:3000/api/postReservation', {
+          users,
+          courseId,
+          courseTitle
+        });
+
+        // 判断预约状态，如果预约成功则使用你的原始逻辑，如果预约失败则使用新的逻辑
+        if (response.data.status === "error") {
+          // 抛出错误，调用catch块中的错误处理
+          throw response.data.message;
+        } else {
+          // 解析响应
+          const { reservationStatus, courseTime } = response.data;
+
+          // 更新预约状态
+          this.isReserveDialogVisible = false;
+          this.reservationStatus = reservationStatus;
+          this.courseTime = courseTime;
+
+          // 显示成功消息
+          this.$message.success('预约成功！等待管理员处理');
+        }
+
+      } catch (error) {
+        console.error(error);
+        // 使用后端返回的错误消息
+        this.$message.error(error);
+      }
     }
   },
 };

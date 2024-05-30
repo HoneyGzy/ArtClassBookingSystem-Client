@@ -9,8 +9,8 @@
 
       <!-- 注册和登录按钮 -->
       <div class="auth-buttons">
-        <el-button class="register" type="primary">注册</el-button>
-        <el-button class="login" type="primary" @click="handleLogin">登录</el-button>
+        <span class="login-prompt">已有账号？</span>
+        <el-button class="login" type="primary" @click="handleLogin">立即登录</el-button>
       </div>
     </el-header>
 
@@ -709,10 +709,14 @@ export default {
   padding-right: 0px; /* 或者根据设计需要调整间距 */
 }
 
-.auth-buttons .register,
-.auth-buttons .login {
-  margin-left: 10px; /* 按钮之间的间距 */
-  /* 按钮共同样式 */
+.login-prompt {
+  margin-right: 5px;
+  color: #333; /* 可根据需要调整字体颜色 */
+}
+
+.login {
+  color: white; /* 可根据需要调整按钮字体颜色 */
+  background-color: #409EFF; /* Element Plus 默认的主要颜色 */
 }
 
 .wrapper {

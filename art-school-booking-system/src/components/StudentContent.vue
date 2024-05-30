@@ -281,7 +281,7 @@
             <course-registration v-if="currentIndex === 0"></course-registration>
             <evaluation-management v-else-if="currentIndex === 1"></evaluation-management>
             <usercenter-coponent  v-else-if="currentIndex === 2"></usercenter-coponent>
-            <search-component> v-else-if="currentIndex === 3"></search-component>
+            <search-component v-else-if="currentIndex === 3"></search-component>
             <!-- <span>{{ dialogContent }}</span> -->
             <template v-slot:footer>
               <span class="dialog-footer">
