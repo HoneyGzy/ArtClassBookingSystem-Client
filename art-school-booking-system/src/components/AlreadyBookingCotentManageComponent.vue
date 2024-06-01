@@ -5,15 +5,22 @@
       <el-table-column prop="courseId" label="课程ID"></el-table-column>
       <el-table-column prop="courseTitle" label="课程名称"></el-table-column>
       <el-table-column prop="reservationStatus" label="预约状态"></el-table-column>
-      <el-table-column prop="courseTime" label="课程时间"></el-table-column>
+
+      <!-- Using v-slot to format the time -->
+      <el-table-column label="课程时间">
+        <template v-slot="scope">
+          {{ formatCourseTime(scope.row.courseTime) }}
+        </template>
+      </el-table-column>
+
       <el-table-column prop="paymentStatus" label="支付状态"></el-table-column>
       <el-table-column>
-      <template v-slot:header>
+        <template v-slot:header>
           <el-input v-model="search" placeholder="搜索课程" />
-      </template>
+        </template>
       </el-table-column>
       <el-table-column label="操作">
-        <template #default="scope">
+        <template v-slot="scope">
           <el-button type="primary" @click="handleManageBooking(scope.row)">管理预约</el-button>
         </template>
       </el-table-column>
@@ -43,18 +50,19 @@
     </template>
   </el-dialog>
 </template>
-  
+
 <script>
 import axios from 'axios';
+import moment from 'moment';
 
 export default {
-  name:'AlreadyBookingCotentManageComponent',
+  name: 'AlreadyBookingCotentManageComponent',
   data() {
     return {
       bookings: [], // 这里需要加载你的预约课程数据
       search: '',
-      useusername:null,
-      courses:[],
+      useusername: null,
+      courses: [],
 
       dialogVisible: false, // 控制模态框显示
       form: { // 表单数据
@@ -65,21 +73,20 @@ export default {
     };
   },
   created() {
-      this.useusername = localStorage.getItem('userName');
-      this.fetchCourses();
+    this.useusername = localStorage.getItem('userName');
+    this.fetchCourses();
   },
-  methods: {  
+  methods: {
     fetchCourses() {
-        axios.get('http://localhost:3000/api/getAllAlreadycourseregistration') // 确保使用正确的HTTP端点
+      axios.get('http://localhost:3000/api/getAllAlreadycourseregistration') // 确保使用正确的HTTP端点
         .then(response => {
-            this.bookings = response.data;
+          this.bookings = response.data;
         })
         .catch(error => {
-            console.error(error);
-            // 添加错误处理
-        })
+          console.error(error);
+          // 添加错误处理
+        });
     },
-
     handleManageBooking(row) {
       console.log(`管理课程 ${row.courseId} 的预约`);
       // 弹出模态框之前，用当前行的数据初始化表单
@@ -117,13 +124,16 @@ export default {
       // 在这里添加获取并显示数据的代码
       // 可以通过获取后台数据库的接口，获取最新的数据并更新到当前组件的 data 属性中，从而实现页面数据的实时刷新
     },
+    formatCourseTime(time) {
+      // Assuming `time` is in ISO format; otherwise, adjust the parsing accordingly
+      return moment(time).format('YYYY-MM-DD HH:mm:ss');
+    }
   },
 };
 </script>
-  
+
 <style scoped>
 .booking-management {
   margin: 20px;
 }
 </style>
-

@@ -148,7 +148,7 @@
             :before-close="handleClose"
           >
             <div v-if="currentNewsPics">
-              <p><strong>日期：</strong>{{ currentNewsPics.publish_date }}</p>
+              <p><strong>日期：</strong>{{ formattedPublishDate }}</p>
               <p><strong>标题：</strong>{{ currentNewsPics.title }}</p>
               <p><strong>内容：</strong>{{ currentNewsPics.content }}</p>
             </div>
@@ -338,6 +338,8 @@ import CourseRegistration from './CourseRegistration.vue';
 import EvaluationManagement from './EvaluationManagement.vue';
 import UsercenterCoponent from'./UserCenter.vue';
 import SearchComponent from './SearchContent.vue'
+import moment from 'moment'
+
 
 // Vue 组件
 export default {
@@ -421,6 +423,9 @@ export default {
   },
 
   computed: {
+    formattedPublishDate() {
+      return this.currentNewsPics ? moment(this.currentNewsPics.publish_date).format('YYYY-MM-DD') : '';
+    },
     dialogWidth() {
       switch (this.currentIndex) {
         case 0:
