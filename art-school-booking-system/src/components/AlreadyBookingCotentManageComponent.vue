@@ -93,6 +93,7 @@ export default {
       this.form.reservationStatus = row.reservationStatus;
       this.form.paymentStatus = row.paymentStatus;
       this.form.courseid = row.courseId;
+      this.form.username = row.username; 
       this.dialogVisible = true; // 显示模态框
     },
     updateBookingStatus() {
@@ -102,6 +103,8 @@ export default {
       axios.post('http://localhost:3000/api/courseregistration_status', {
         params: {
           courseId: this.form.courseid, // 需要正确设置courseId
+          reservationStatus: this.form.reservationStatus,
+          username: this.form.username
           // 其他需要的参数
         }
       })

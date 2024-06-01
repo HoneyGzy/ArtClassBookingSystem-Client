@@ -20,22 +20,22 @@
           default-active="1" 
           style="height: 100vh;padding: 18px"
         >
-        <el-menu-item index="3" @click="handleNavSelection('3')">
+        <el-menu-item index="1" @click="handleNavSelection('1')">
           <el-icon><search /></el-icon>
           <span>课程列表</span>
         </el-menu-item>
 
-        <el-menu-item index="5" @click="handleNavSelection('5')">
+        <el-menu-item index="2" @click="handleNavSelection('2')">
           <el-icon><search /></el-icon>
           <span>课程搜索</span>
         </el-menu-item>
 
-        <el-menu-item index="6" @click="handleNavSelection('6')">
+        <el-menu-item index="3" @click="handleNavSelection('3')">
           <el-icon><calendar /></el-icon>
           <span>我的预约</span>
         </el-menu-item>
 
-        <el-menu-item index="9"  @click="handleNavSelection('9')">
+        <el-menu-item index="4"  @click="handleNavSelection('4')">
           <el-icon><user /></el-icon>
           <span>用户中心</span>
         </el-menu-item>
@@ -133,31 +133,16 @@ export default {
     handleNavSelection(index){
       switch(index){
         case '1':
-          this.selectedCategoryComponent = 'HomeContent';
-          break;
-        case '2':
-          this.selectedCategoryComponent = "UserManagerComponent";
-          break;
-        case '3':
           this.selectedCategoryComponent = "CourseListComponent";
           // 逻辑处理“编辑”功能
           break;
-        case '4':
-          this.selectedCategoryComponent = 'HotRecommend';
-          break;
-        case '5':
+        case '2':
           this.selectedCategoryComponent = 'searchComponent';
           break;
-        case '6': 
+        case '3': 
           this.selectedCategoryComponent = 'TeacherBookingCotentManageComponent';
-          break;
-        case '7':
-          this.selectedCategoryComponent = 'CourseRegistration';
-          break;    
-        case '8':
-          this.selectedCategoryComponent = 'EvaluationManagementComponent';
-          break;    
-        case '9':
+          break;   
+        case '4':
           this.selectedCategoryComponent = 'UserCenterComponent';
           break;        
 
