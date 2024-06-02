@@ -72,6 +72,11 @@
           required
         />
       </div>
+      <!-- 新添加的教师 ID 表单，当角色为老师时显示 -->
+      <div class="form-group" v-if="registerForm.role === 'teacher'">
+        <label for="teacher-id-register">请输入教师ID:</label>
+        <input type="text" id="teacher-id-register" v-model="registerForm.teacher_id" required />
+      </div>
       <!--添加注册和返回登录按钮 -->
       <div class="form-group button-group">
           <button type="submit" class="register-button">注册</button>
@@ -98,7 +103,8 @@ export default {
         role: '',
         username: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        teacher_id: ''
       },
       loginError: '', // 用于捕获并显示登录错误
       isRegistering: false,   // 默认处于登录模式
@@ -182,7 +188,8 @@ export default {
         username: this.registerForm.username,
         password: this.registerForm.password,
         role: this.registerForm.role,
-        confirmPassword: this.registerForm.confirmPassword
+        confirmPassword: this.registerForm.confirmPassword,
+        teacher_id: this.registerForm.role === 'teacher' ? this.registerForm.teacher_id : null 
       })
       .then(response => {
 

@@ -26,7 +26,7 @@
       </el-form-item>
 
       <el-form-item v-if="role == 'teacher'" label="教师ID">
-        <el-input v-model="teacherId" placeholder="输入教师ID"></el-input>
+        <el-input v-model="teacher_id" placeholder="输入教师ID"></el-input>
       </el-form-item>
 
       <el-form-item>
@@ -48,7 +48,7 @@ export default {
         role: '',
         password: '',
         confirmPassword: '',
-        teacherId: '',    // 新的数据项：teacherId  
+        teacher_id: '',    // 新的数据项：teacher_id  
       };
     },
     
@@ -90,7 +90,7 @@ export default {
             password: this.password,
             role: this.role,
             confirmPassword: this.confirmPassword,
-            teacherId: this.teacherId     // 传递 teacherId
+            teacher_id: this.teacher_id     // 传递 teacher_id
         })
         .then(response => {
 
