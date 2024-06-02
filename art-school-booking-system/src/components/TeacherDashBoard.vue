@@ -61,7 +61,7 @@ import UserManagerComponent from './UserManagerContent.vue'
 import EvaluationManagementComponent from './EvaluationManagement.vue'
 import UserCenterComponent from './UserCenter.vue'
 import CourseRegistration from './CourseRegistration.vue'
-import CourseListComponent from './CourseListContent.vue'
+import CourseListComponent from './CourseListContentOfTeacher.vue'
 import CourseManagerComponent from './CourseManagerContent.vue'
 import TeacherBookingCotentManageComponent from './TeacherBookingCotentManageComponent.vue'
 // import { Search, Calendar, ShoppingCart, Comment, User } from '@element-plus/icons-vue';
