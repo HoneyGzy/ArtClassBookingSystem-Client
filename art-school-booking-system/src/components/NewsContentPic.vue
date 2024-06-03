@@ -1,10 +1,14 @@
 <template>
   <div class="center-container">
     <!-- 新闻表格 -->
-    <el-table :data="formattedNewsList" style="width: 100%" empty-text="暂无资讯">
-      <el-table-column prop="title" label="资讯标题"></el-table-column>
-      <el-table-column prop="content" label="资讯内容"></el-table-column>
-      <el-table-column prop="publish_date" label="发布时间"></el-table-column>
+    <el-table :data="formattedNewsList" style="width: 100%" empty-text="暂无新闻">
+      <el-table-column prop="title" label="新闻标题"></el-table-column>
+      <el-table-column prop="content" label="新闻内容"></el-table-column>
+      <el-table-column
+        prop="publish_date"
+        label="发布时间"
+        :formatter="formatDate"
+      ></el-table-column>
       <el-table-column label="操作">
         <template #default="scope">
           <!-- <el-button type="primary" @click="handleEditNews(scope.row)">修改</el-button> -->
@@ -60,7 +64,7 @@
             </el-upload>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('form')">提交</el-button>
+            <el-button type="primary" @click="submitForm('form')">提交/修改</el-button>
             <el-button @click="resetForm('form')">重置</el-button>
           </el-form-item>
         </el-form>
@@ -120,7 +124,7 @@ export default {
             console.error("Invalid API response");
             return;
           }
-          this.formattedNewsList = response.data
+          this.formattedNewsList = response.data;
         })
         .catch(error => {
           console.error(error);
@@ -128,38 +132,33 @@ export default {
     },
 
     handleDeleteNews(news) {
-      const newsId = news.newid; // 假设每条资讯都有一个id属性
-      console.log(newsId)
-      // 使用Element Plus的MessageBox来确认是否删除资讯
-      ElMessageBox.confirm(`确定要删除标题为 "${news.title}" 的资讯吗？`, '警告', {
+      const newsId = news.newid; // 假设每条新闻都有一个id属性
+      console.log(newsId);
+      // 使用Element Plus的MessageBox来确认是否删除新闻
+      ElMessageBox.confirm(`确定要删除标题为 "${news.title}" 的新闻吗？`, '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
       }).then(() => {
         axios.delete(`http://localhost:3000/api/news_images/${newsId}`)
         .then(response => {
-          console.log(response)
+          console.log(response);
           // 如果后端返回成功状态，更新前端的newsList
-          this.formattedNewsList = this.formattedNewsList.filter(item => item.id !== newsId);
-          this.fetchNews()
+          this.formattedNewsList = this.formattedNewsList.filter(item => item.newid !== newsId);
+          this.fetchNews();
           this.$message({
             type: 'success',
-            message: '资讯已删除',
+            message: '新闻已删除',
           });
         })
         .catch(error => {
-          console.error("删除资讯时出现错误：", error);
-          this.$message.error('资讯删除失败');
+          console.error("删除新闻时出现错误：", error);
+          this.$message.error('新闻删除失败');
         });
       }).catch(() => {
-        console.log('资讯删除操作已取消');
+        console.log('新闻删除操作已取消');
       });
     },
-
-    handleEditNews(news) {
-        console.log(news)
-       
-      },
 
     showAddNewsForm() {
       this.dialogAddVisible = true; // 显示添加新闻的表单
@@ -201,7 +200,6 @@ export default {
               this.dialogVisible = true;
               this.fetchNews();
               this.$message.success('提交成功');
-              
             })
             .catch(error => {
               console.error('Error:', error);
@@ -228,6 +226,16 @@ export default {
       this.dialogVisible = false;
       this.previewNews = null;
     },
+    formatDate(row, column, cellValue) {
+      if (!cellValue) {
+        return '';
+      }
+      const date = new Date(cellValue);
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
   },
 };
 </script>
