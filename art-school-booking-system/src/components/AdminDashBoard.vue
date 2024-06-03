@@ -178,9 +178,7 @@ export default {
     },
     handleNavSelection(index){
       switch(index){
-        case '1':
-          this.selectedCategoryComponent = 'HomeContent';
-          break;
+       
         case '2-1':
           this.selectedCategoryComponent = "userlistComponent";
           break;
@@ -217,19 +215,6 @@ export default {
         case '5-3':
           this.selectedCategoryComponent = 'NewsContentPicComponent';
           break;
-        case '6':
-          this.selectedCategoryComponent = 'BookingCotentManageComponent';
-          break;    
-        case '7':
-          this.selectedCategoryComponent = 'CourseRegistration';
-          break;    
-        case '8':
-          this.selectedCategoryComponent = 'EvaluationManagementComponent';
-          break;    
-        case '9':
-          this.selectedCategoryComponent = 'UserCenterComponent';
-          break;        
-
         // 其他菜单项对应的代码...
       }
     },

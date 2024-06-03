@@ -104,8 +104,8 @@
         this.isEditMode = true; // 表示现在是编辑模式
         this.currentNews = Object.assign({}, news); // 设置当前资讯为所点击的资讯
         this.formNews = this.currentNews;
-
       },
+      
       handleDeleteNews(news) {
         const newsId = news.id; // 假设每条资讯都有一个id属性
 
