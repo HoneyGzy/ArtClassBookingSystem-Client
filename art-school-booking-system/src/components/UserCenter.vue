@@ -83,9 +83,9 @@
               </CourseCard>
             </el-row>
           </el-tab-pane>
-          <el-tab-pane label="喜好设置" name="preferences">
+          <!-- <el-tab-pane label="喜好设置" name="preferences">
             <el-checkbox v-model="user.preferences">开启通知</el-checkbox>
-          </el-tab-pane>
+          </el-tab-pane> -->
           <el-tab-pane label="交易记录" name="transactions">
             <table>
               <thead>
