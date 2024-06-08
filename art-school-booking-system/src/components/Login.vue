@@ -153,74 +153,90 @@ export default {
       }
     },
     handleRegister() {
-      // 验证用户名
-      if (!this.registerForm.username) {
-        ElNotification({
-            title: '错误',
-            message: '用户名不能为空',
-            type: 'error'
-             });
-            return;
-      }
+    // 验证用户名
+    if (!this.registerForm.username) {
+      ElNotification({
+        title: '错误',
+        message: '用户名不能为空',
+        type: 'error'
+      });
+      return;
+    }
 
-      // 验证密码
-      if (!this.registerForm.password) {
-        ElNotification({
-            title: '错误',
-            message: '密码不能为空',
-            type: 'error'
-            });
-            return;
-      }
+    // 验证密码
+    if (!this.registerForm.password) {
+      ElNotification({
+        title: '错误',
+        message: '密码不能为空',
+        type: 'error'
+      });
+      return;
+    }
 
-      // 验证二次输入密码是否与第一次输入一致
-      if (this.registerForm.password !== this.registerForm.confirmPassword) {
-        ElNotification({
-            title: '错误',
-            message: '两次输入的密码不一致，请重新输入',
-            type: 'error'
-            });
-            return;
-      }
-      // 发送注册请求
-      // 这里假设你有一个名为 register 的 API 可以进行注册操作
-      axios.post('http://localhost:3000/api/register', {
-        username: this.registerForm.username,
-        password: this.registerForm.password,
-        role: this.registerForm.role,
-        confirmPassword: this.registerForm.confirmPassword,
-        teacher_id: this.registerForm.role === 'teacher' ? this.registerForm.teacher_id : null 
-      })
-      .then(response => {
+    // 验证二次输入密码是否与第一次输入一致
+    if (this.registerForm.password !== this.registerForm.confirmPassword) {
+      ElNotification({
+        title: '错误',
+        message: '两次输入的密码不一致，请重新输入',
+        type: 'error'
+      });
+      return;
+    }
 
-        console.log(response)
-        // 根据你的 API 返回值进行操作，例如，如果注册成功，则切换回登录界面
-        if (response.status == 200 ) {
-          this.isRegistering = false;         
+    // 发送注册请求
+    axios.post('http://localhost:3000/api/register', {
+      username: this.registerForm.username,
+      password: this.registerForm.password,
+      role: this.registerForm.role,
+      confirmPassword: this.registerForm.confirmPassword,
+      teacher_id: this.registerForm.role === 'teacher' ? this.registerForm.teacher_id : null 
+    })
+    .then(response => {
+      console.log(response);
+      // 根据你的 API 返回值进行操作，例如，如果注册成功，则切换回登录界面
+      if (response.status == 200) {
+        this.isRegistering = false;         
+        ElNotification({
+          title: '成功',
+          message: '注册成功，请登录',
+          type: 'success'
+        });
+      } else {
+        // 其他非200的响应处理（可选）
+        ElNotification({
+          title: '错误',
+          message: '注册失败',
+          type: 'error'
+        });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      if (error.response) {
+        // 根据status code来判断错误原因
+        if (error.response.status === 400) {
           ElNotification({
-                title: '成功',
-                message: `注册成功，请登录`,
-                type: 'success'
-                });
+            title: '错误',
+            message: '注册失败，用户名已经存在',
+            type: 'error'
+          });
         } else {
-          // 如果注册失败，向用户显示错误信息
           ElNotification({
-                title: '错误',
-                message: response.data.message,
-                type: 'error'
-                });
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        console.log(error);
-            ElNotification({
             title: '错误',
             message: '注册失败，服务器错误',
             type: 'error'
+          });
+        }
+      } else {
+        ElNotification({
+          title: '错误',
+          message: '注册失败，无法连接到服务器',
+          type: 'error'
         });
-      });
-    },
+      }
+    });
+  },
+
     switchToRegister() {
       this.isRegistering = true;
     },

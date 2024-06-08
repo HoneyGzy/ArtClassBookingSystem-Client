@@ -201,7 +201,7 @@ export default {
       const now = new Date();
       
       // 如果课程状态为预约成功
-      if (course.reservationStatus === '预约成功') {
+      if (course.paymentStatus === '已支付') {
         
         // 检查课程日期是否在当前日期之后
         if (courseDate > now) {
