@@ -285,7 +285,11 @@ export default {
             const response = await axios.post('http://localhost:3000/api/user/profile', this.user);
             console.log(response)
             this.isProfileCompleted = true;
-            console.log("Successfully submitted user profile.");
+            this.$message({
+              message: '用戶信息更新成功',
+              type: 'success',
+              duration: 3000
+            });
           } catch (error) {
             console.error("Error submitting user profile:", error);
           }
