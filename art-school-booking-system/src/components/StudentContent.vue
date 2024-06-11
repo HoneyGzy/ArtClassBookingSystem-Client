@@ -4,9 +4,7 @@
     <el-header class="header-background">
       <!-- Logo区域 -->
       <div class="logo"></div>
-      <div>
-        <SearchComponent />
-      </div>
+      
       <!-- 注册和登录按钮 -->
       <div class="user-info">
         <span class="username">欢迎您：{{ username }}</span>
