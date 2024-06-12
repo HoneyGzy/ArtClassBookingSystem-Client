@@ -312,7 +312,8 @@ export default {
           }
         })
         .then(response => {
-          this.searchResults = response.data;
+            // 将数据倒序
+          this.searchResults = response.data.reverse();
         })
         .catch(error => {
           console.error(error);
